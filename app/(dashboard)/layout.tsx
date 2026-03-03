@@ -10,6 +10,8 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/dashboard/leads', label: 'Leads' },
   { href: '/dashboard/uploads', label: 'Upload CSV' },
+  { href: '/dashboard/ai-reviews', label: 'AI Reviews' },
+  { href: '/dashboard/ai-insights', label: 'AI Insights' },
 ]
 
 export default function DashboardLayout({
