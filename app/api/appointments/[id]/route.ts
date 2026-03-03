@@ -4,7 +4,7 @@ import type { Appointment } from '@/types/phase3'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +12,7 @@ export async function PATCH(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const appointmentId = params.id
+  const { id: appointmentId } = await params
   const body = await request.json()
 
   // Update appointment
@@ -36,7 +36,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -44,7 +44,7 @@ export async function DELETE(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const appointmentId = params.id
+  const { id: appointmentId } = await params
 
   // Delete appointment
   const { error } = await supabase

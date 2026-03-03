@@ -4,7 +4,7 @@ import type { ScrapeTarget } from '@/types/scraping'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +12,7 @@ export async function PATCH(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const targetId = params.id
+  const { id: targetId } = await params
   const body = await request.json()
 
   // Update scrape target
@@ -35,7 +35,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -43,7 +43,7 @@ export async function DELETE(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const targetId = params.id
+  const { id: targetId } = await params
 
   // Delete scrape target
   const { error } = await supabase

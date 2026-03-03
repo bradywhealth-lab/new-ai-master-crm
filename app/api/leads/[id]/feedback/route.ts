@@ -4,7 +4,7 @@ import type { AIPrediction, FeedbackData } from '@/types/feedback'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +12,7 @@ export async function POST(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const leadId = params.id
+  const { id: leadId } = await params
   const { newDisposition, newScore, smsLogId, confirmOnly } = await request.json()
 
   // Get current lead to capture AI prediction

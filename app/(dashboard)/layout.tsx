@@ -10,6 +10,10 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/dashboard/leads', label: 'Leads' },
   { href: '/dashboard/uploads', label: 'Upload CSV' },
+  { href: '/dashboard/scraping', label: 'Scraping' },
+  { href: '/dashboard/social', label: 'Social' },
+  { href: '/dashboard/content', label: 'Content' },
+  { href: '/dashboard/trends', label: 'Trends' },
   { href: '/dashboard/ai-reviews', label: 'AI Reviews' },
   { href: '/dashboard/ai-insights', label: 'AI Insights' },
 ]

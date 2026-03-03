@@ -4,7 +4,7 @@ import type { AppointmentCreate, Appointment } from '@/types/phase3'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +12,7 @@ export async function POST(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const leadId = params.id
+  const { id: leadId } = await params
   const body: AppointmentCreate = await request.json()
 
   // Verify lead exists and belongs to user
@@ -27,8 +27,12 @@ export async function POST(
   }
 
   // Calculate duration if not provided
-  const duration = body.duration_minutes ||
-    (body.end_time ? Math.floor((new Date(body.end_time).getTime() - new Date(body.start_time).getTime()) / 60000 : null)
+  let duration = body.duration_minutes || null
+  if (!duration && body.end_time && body.start_time) {
+    const startTime = new Date(body.start_time).getTime()
+    const endTime = new Date(body.end_time).getTime()
+    duration = Math.floor((endTime - startTime) / 60000)
+  }
 
   // Create appointment
   const { data: appointment, error } = await supabase
@@ -57,7 +61,7 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -65,7 +69,7 @@ export async function GET(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const leadId = params.id
+  const { id: leadId } = await params
 
   // Get appointments for this lead
   const { data: appointments, error } = await supabase

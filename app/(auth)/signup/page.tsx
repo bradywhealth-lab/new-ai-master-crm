@@ -36,11 +36,7 @@ export default function SignupPage() {
       setError(error.message)
       setLoading(false)
     } else if (data.user) {
-      // Create profile
-      await supabase.from('profiles').insert({
-        id: data.user.id,
-        full_name: fullName,
-      })
+      // Profile is created automatically by database trigger
       router.push('/dashboard')
     }
   }
