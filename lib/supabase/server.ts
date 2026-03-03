@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { Database } from './supabase/types'
 
-export function createServerSupabaseClient() {
+export function createClient() {
   const cookieStore = cookies()
 
   return createServerClient<Database>(
@@ -23,3 +23,5 @@ export function createServerSupabaseClient() {
     }
   )
 }
+
+export { createClient as createServerSupabaseClient }
