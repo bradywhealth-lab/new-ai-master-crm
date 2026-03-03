@@ -10,6 +10,9 @@ import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import SMSThread from '@/components/sms-thread'
 import AIPredictionCard from '@/components/ai-prediction-card'
+import LeadNotes from '@/components/lead-notes'
+import FollowUpScheduler from '@/components/follow-up-scheduler'
+import AppointmentsManager from '@/components/appointments-manager'
 
 interface Lead {
   id: string
@@ -36,6 +39,7 @@ export default function LeadDetail() {
   const leadId = params.id
   const [lead, setLead] = useState<Lead | null>(null)
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'overview' | 'followups' | 'appointments' | 'notes'>('overview')
   const supabase = createClient()
 
   useEffect(() => {
@@ -148,33 +152,64 @@ export default function LeadDetail() {
         </CardContent>
       </Card>
 
-      {/* Notes */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Notes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="whitespace-pre-wrap">{lead.notes || 'No notes'}</p>
-        </CardContent>
-      </Card>
+      {/* Tabs */}
+      <div className="border-b">
+        <div className="flex gap-4">
+          {[
+            { key: 'overview', label: 'Overview' },
+            { key: 'followups', label: 'Follow-ups' },
+            { key: 'appointments', label: 'Appointments' },
+            { key: 'notes', label: 'Notes' }
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as any)}
+              className={`pb-2 border-b-2 transition-colors ${
+                activeTab === tab.key
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {/* AI Prediction Card */}
-      {lead.ai_score !== null && (
-        <AIPredictionCard
-          leadId={leadId!}
-          prediction={{
-            disposition: lead.disposition,
-            score: lead.ai_score || 0,
-            reasoning: lead.ai_qualification_reason || ''
-          }}
-          onConfirm={handleAIAction}
-          onEdit={handleAIAction}
-          onAddNote={handleAIAction}
-        />
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <>
+          {/* AI Prediction Card */}
+          {lead.ai_score !== null && (
+            <AIPredictionCard
+              leadId={leadId!}
+              prediction={{
+                disposition: lead.disposition,
+                score: lead.ai_score || 0,
+                reasoning: lead.ai_qualification_reason || ''
+              }}
+              onConfirm={handleAIAction}
+              onEdit={handleAIAction}
+              onAddNote={handleAIAction}
+            />
+          )}
+
+          {/* SMS Thread */}
+          <SMSThread leadId={leadId!} />
+        </>
       )}
 
-      {/* SMS Thread */}
-      <SMSThread leadId={leadId!} />
+      {activeTab === 'followups' && (
+        <FollowUpScheduler leadId={leadId!} />
+      )}
+
+      {activeTab === 'appointments' && (
+        <AppointmentsManager leadId={leadId!} />
+      )}
+
+      {activeTab === 'notes' && (
+        <LeadNotes leadId={leadId!} />
+      )}
     </div>
   )
 }
