@@ -12,10 +12,11 @@ export interface UserCorrection {
 
 export interface FeedbackData {
   lead_id: string
+  user_id: string
   sms_log_id: string | null
   ai_prediction: AIPrediction
-  user_correction: UserCorrection
-  feedback_type: 'outcome_based' | 'manual_review'
+  user_correction: UserCorrection | null
+  feedback_type: 'outcome_based' | 'manual_review' | 'prediction_confirmed'
 }
 
 export interface ReviewSubmission {

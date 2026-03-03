@@ -6,7 +6,22 @@
       "Bash(pnpm create next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias \"@/*\" --yes)",
       "Bash(npm create next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias \"@/*\" --yes)",
       "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias \"@/*\" --use-npm --yes --skip-install)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(npm run dev)",
+      "Bash(lsof -ti:3000)",
+      "Bash(git checkout -b phase2-ai-learning)",
+      "Bash(git add docs/plans/2025-03-03-insureassist-phase2-ai-feedback-learning-design.md)",
+      "Bash(git commit -m \"docs: add Phase 2 AI Feedback Learning System design\")",
+      "Bash(git add app/\\\\\\(dashboard\\\\\\)/layout.tsx)",
+      "Bash(git commit -m \"feat: add AI reviews and insights navigation\")",
+      "Bash(git push -u origin phase2-ai-learning)",
+      "Bash(git remote set-url origin git@github.com:bradywilson/new-ai-master-crm.git)",
+      "Bash(/Users/bradywilson/.local/bin/gh repo create new-ai-master-crm --public --description \"InsureAssist CRM - AI-powered insurance agent management system\")",
+      "Bash(/Users/bradywilson/.local/bin/gh repo view bradywilson --json)",
+      "Bash(git remote set-url origin https://github.com/bradywhealth-lab/new-ai-master-crm.git)",
+      "Bash(/Users/bradywilson/.local/bin/gh pr:*)",
+      "Bash(/Users/bradywilson/.local/bin/coderabbit review --plain -t committed https://github.com/bradywhealth-lab/new-ai-master-crm/pull/1)",
+      "Bash(/Users/bradywilson/NEW AI:*)"
     ]
   }
 }
