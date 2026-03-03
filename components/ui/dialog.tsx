@@ -12,10 +12,20 @@ const DialogContext = React.createContext<{
   setOpen: () => {}
 })
 
-const Dialog = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  const [open, setOpen] = React.useState(false)
+interface DialogProps extends React.HTMLAttributes<HTMLDivElement> {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  children: React.ReactNode
+}
+
+const Dialog = ({ open, onOpenChange, children, ...props }: DialogProps) => {
+  const [internalOpen, setInternalOpen] = React.useState(false)
+  const isControlled = open !== undefined
+  const finalOpen = isControlled ? open : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
+
   return (
-    <DialogContext.Provider value={{ open, setOpen }}>
+    <DialogContext.Provider value={{ open: finalOpen, setOpen }}>
       <div {...props}>{children}</div>
     </DialogContext.Provider>
   )

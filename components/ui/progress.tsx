@@ -3,8 +3,6 @@ import * as ProgressPrimitive from "@radix-ui/react-progress"
 
 import { cn } from "@/lib/utils"
 
-const Progress = ProgressPrimitive.Root
-
 const ProgressValue = ProgressPrimitive.Value
 
 const ProgressIndicator = ProgressPrimitive.Indicator

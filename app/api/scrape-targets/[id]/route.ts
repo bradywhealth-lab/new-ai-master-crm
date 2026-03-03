@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import type { Appointment } from '@/types/phase3'
+import type { ScrapeTarget } from '@/types/scraping'
 
 export async function PATCH(
   request: NextRequest,
@@ -12,26 +12,25 @@ export async function PATCH(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id: appointmentId } = await params
+  const { id: targetId } = await params
   const body = await request.json()
 
-  // Update appointment
-  const { data: appointment, error } = await supabase
-    .from('appointments')
+  // Update scrape target
+  const { data: target, error } = await supabase
+    .from('scrape_targets')
     .update({
       ...body,
       updated_at: new Date().toISOString()
     })
-    .eq('id', appointmentId)
+    .eq('id', targetId)
     .select()
     .single()
 
   if (error) {
-    console.error('Appointment update error:', error)
     return Response.json({ error: error.message }, { status: 500 })
   }
 
-  return Response.json({ data: appointment as Appointment })
+  return Response.json({ data: target as ScrapeTarget })
 }
 
 export async function DELETE(
@@ -44,16 +43,15 @@ export async function DELETE(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id: appointmentId } = await params
+  const { id: targetId } = await params
 
-  // Delete appointment
+  // Delete scrape target
   const { error } = await supabase
-    .from('appointments')
+    .from('scrape_targets')
     .delete()
-    .eq('id', appointmentId)
+    .eq('id', targetId)
 
   if (error) {
-    console.error('Appointment delete error:', error)
     return Response.json({ error: error.message }, { status: 500 })
   }
 

@@ -21,7 +21,8 @@
       "Bash(git remote set-url origin https://github.com/bradywhealth-lab/new-ai-master-crm.git)",
       "Bash(/Users/bradywilson/.local/bin/gh pr:*)",
       "Bash(/Users/bradywilson/.local/bin/coderabbit review --plain -t committed https://github.com/bradywhealth-lab/new-ai-master-crm/pull/1)",
-      "Bash(/Users/bradywilson/NEW AI:*)"
+      "Bash(/Users/bradywilson/NEW AI:*)",
+      "Bash(npm install puppeteer @types/puppeteer)"
     ]
   }
 }

@@ -4,7 +4,7 @@ import type { FollowUpScheduleCreate, FollowUpSchedule } from '@/types/phase3'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +12,7 @@ export async function POST(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const leadId = params.id
+  const { id: leadId } = await params
   const body: FollowUpScheduleCreate = await request.json()
 
   // Verify lead exists and belongs to user
@@ -55,7 +55,7 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -63,7 +63,7 @@ export async function GET(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const leadId = params.id
+  const { id: leadId } = await params
 
   // Get follow-ups for this lead
   const { data: followUps, error } = await supabase
