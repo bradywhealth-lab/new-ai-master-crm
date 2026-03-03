@@ -156,13 +156,14 @@ export default function LeadDetail() {
       {/* AI Prediction Card */}
       {lead.ai_score !== null && (
         <AIPredictionCard
+          leadId={leadId!}
           prediction={{
             disposition: lead.disposition,
             score: lead.ai_score || 0,
             reasoning: lead.ai_qualification_reason || ''
           }}
           onConfirm={() => console.log('Confirmed prediction')}
-          onEdit={() => console.log('Edit prediction')}
+          onEdit={(newDisposition, newScore) => console.log('Edit prediction:', newDisposition, newScore)}
           onAddNote={(note) => console.log('Add note:', note)}
         />
       )}

@@ -9,19 +9,26 @@ import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog'
 
 interface AIPredictionCardProps {
   prediction: AIPrediction
+  leadId: string
   onConfirm: () => void
-  onEdit: () => void
+  onEdit: (newDisposition?: string, newScore?: number) => void
   onAddNote: (note: string) => void
 }
 
 export default function AIPredictionCard({
   prediction,
+  leadId,
   onConfirm,
   onEdit,
   onAddNote
 }: AIPredictionCardProps) {
   const [noteOpen, setNoteOpen] = useState(false)
   const [note, setNote] = useState('')
+  const [editOpen, setEditOpen] = useState(false)
+  const [editDisposition, setEditDisposition] = useState(prediction.disposition)
+  const [editScore, setEditScore] = useState(prediction.score)
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
   const confidenceLevel = prediction.score >= 80 ? 'High' : prediction.score >= 60 ? 'Medium' : 'Low'
   const confidenceColor = prediction.score >= 80
@@ -29,6 +36,78 @@ export default function AIPredictionCard({
     : prediction.score >= 60
     ? 'bg-yellow-100 text-yellow-800'
     : 'bg-red-100 text-red-800'
+
+  async function handleConfirm() {
+    setLoading(true)
+    try {
+      await fetch(`/api/leads/${leadId}/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          newDisposition: prediction.disposition,
+          newScore: prediction.score
+        })
+      })
+      setMessage('Prediction confirmed!')
+      onConfirm?.()
+    } catch (error) {
+      console.error('Failed to confirm prediction:', error)
+      setMessage('Failed to confirm')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleEditSave() {
+    setLoading(true)
+    try {
+      await fetch('/api/feedback/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: leadId,
+          ai_prediction_confirmed: false,
+          new_disposition: editDisposition,
+          new_score: editScore,
+          note: ''
+        })
+      })
+      setEditOpen(false)
+      onEdit?.(editDisposition, editScore)
+      setMessage('Prediction updated!')
+    } catch (error) {
+      console.error('Failed to edit prediction:', error)
+      setMessage('Failed to update')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleAddNote() {
+    setLoading(true)
+    try {
+      await fetch('/api/feedback/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lead_id: leadId,
+          ai_prediction_confirmed: true,
+          new_disposition: undefined,
+          new_score: undefined,
+          note: note
+        })
+      }
+      onAddNote?.(note)
+      setNoteOpen(false)
+      setNote('')
+      setMessage('Note added!')
+    } catch (error) {
+      console.error('Failed to add note:', error)
+      setMessage('Failed to add note')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <Card className="border-2">
@@ -39,6 +118,11 @@ export default function AIPredictionCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {message && (
+          <div className={`p-2 rounded ${message.includes('Failed') ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+            {message}
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <span className="font-semibold text-lg">{prediction.disposition.toUpperCase()}</span>
           <span className="text-gray-600">({prediction.score}/100)</span>
@@ -47,10 +131,10 @@ export default function AIPredictionCard({
         <p className="text-sm text-gray-700">{prediction.reasoning}</p>
 
         <div className="flex gap-2 pt-2">
-          <Button onClick={onConfirm} size="sm" variant="default">
+          <Button onClick={handleConfirm} size="sm" variant="default" disabled={loading}>
             ✓ Confirm
           </Button>
-          <Dialog>
+          <Dialog open={editOpen} onOpenChange={setEditOpen}>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline">✏️ Edit</Button>
             </DialogTrigger>
@@ -61,7 +145,8 @@ export default function AIPredictionCard({
                   <label className="block text-sm font-medium mb-1">Disposition</label>
                   <input
                     type="text"
-                    defaultValue={prediction.disposition}
+                    value={editDisposition}
+                    onChange={(e) => setEditDisposition(e.target.value)}
                     className="w-full border rounded p-2"
                   />
                 </div>
@@ -71,16 +156,24 @@ export default function AIPredictionCard({
                     type="number"
                     min="0"
                     max="100"
-                    defaultValue={prediction.score}
+                    value={editScore}
+                    onChange={(e) => setEditScore(Number(e.target.value))}
                     className="w-full border rounded p-2"
                   />
                 </div>
-                <Button onClick={onEdit} className="w-full">Save Changes</Button>
+                <div className="flex gap-2">
+                  <Button onClick={handleEditSave} className="flex-1" disabled={loading}>
+                    Save Changes
+                  </Button>
+                  <Button onClick={() => setEditOpen(false)} variant="outline" disabled={loading}>
+                    Cancel
+                  </Button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
 
-          <Dialog>
+          <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline">📝 Add Note</Button>
             </DialogTrigger>
@@ -93,10 +186,18 @@ export default function AIPredictionCard({
                 className="w-full border rounded p-2 min-h-[100px]"
               />
               <div className="flex gap-2 mt-4">
-                <Button onClick={() => { onAddNote(note); setNoteOpen(false) }} className="flex-1">
+                <Button
+                  onClick={handleAddNote}
+                  className="flex-1"
+                  disabled={loading}
+                >
                   Save Note
                 </Button>
-                <Button onClick={() => setNoteOpen(false)} variant="outline">
+                <Button
+                  onClick={() => setNoteOpen(false)}
+                  variant="outline"
+                  disabled={loading}
+                >
                   Cancel
                 </Button>
               </div>

@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
 
   const feedbackData = {
     lead_id,
+    user_id: user.id,
     sms_log_id: null,
     ai_prediction: aiPrediction,
     user_correction: {

@@ -39,6 +39,7 @@ export async function POST(
 
   const feedbackData: FeedbackData = {
     lead_id: leadId,
+    user_id: user.id,
     sms_log_id: smsLogId || null,
     ai_prediction: aiPrediction,
     user_correction: {

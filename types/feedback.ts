@@ -12,6 +12,7 @@ export interface UserCorrection {
 
 export interface FeedbackData {
   lead_id: string
+  user_id: string
   sms_log_id: string | null
   ai_prediction: AIPrediction
   user_correction: UserCorrection

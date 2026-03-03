@@ -11,17 +11,18 @@ interface AIReviewListProps {
 export default function AIReviewList({ leads }: AIReviewListProps) {
   const [confirmedIds, setConfirmedIds] = useState<Set<string>>(new Set())
 
-  const handleConfirm = (leadId: string) => {
+  const handleConfirm = async (leadId: string) => {
     setConfirmedIds(new Set(confirmedIds).add(leadId))
   }
 
-  const handleEdit = (leadId: string) => {
-    // Open edit dialog
-    console.log('Edit prediction for:', leadId)
+  const handleEdit = async (leadId: string, newDisposition?: string, newScore?: number) => {
+    console.log('Edit prediction for:', leadId, { newDisposition, newScore })
+    // The edit is handled by the AIPredictionCard component
   }
 
-  const handleAddNote = (leadId: string, note: string) => {
+  const handleAddNote = async (leadId: string, note: string) => {
     console.log('Add note for:', leadId, note)
+    // The note is handled by the AIPredictionCard component
   }
 
   return (
@@ -40,10 +41,11 @@ export default function AIReviewList({ leads }: AIReviewListProps) {
         return (
           <AIPredictionCard
             key={lead.id}
+            leadId={lead.id}
             prediction={prediction}
             onConfirm={() => handleConfirm(lead.id)}
-            onEdit={() => handleEdit(lead.id)}
-            onAddNote={(note) => handleAddNote(lead.id, note)}
+            onEdit={handleEdit}
+            onAddNote={handleAddNote}
           />
         )
       })}
