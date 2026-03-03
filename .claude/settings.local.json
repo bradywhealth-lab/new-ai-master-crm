@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add docs/plans/2025-03-02-insureassist-phase1-mvp-implementation.md)",
+      "Bash(git commit -m \"docs: add Phase 1 implementation plan\")",
+      "Bash(pnpm create next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias \"@/*\" --yes)",
+      "Bash(npm create next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias \"@/*\" --use-npm --yes --skip-install)",
+      "Bash(npm install)"
+    ]
+  }
+}
