@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { parseCSV } from '@/lib/csv-parser'
+import { applyBasicQualificationRules } from '@/lib/qualification-rules'
 
 export default function CSVUploader() {
   const [file, setFile] = useState<File | null>(null)
@@ -60,18 +61,30 @@ export default function CSVUploader() {
       for (let i = 0; i < parsedLeads.length; i += batchSize) {
         const batch = parsedLeads.slice(i, i + batchSize)
 
-        const { error } = await supabase.from('leads').insert(
-          batch.map((lead) => ({
+        // Apply qualification rules to each lead
+        const qualifiedLeads = batch.map((lead) => {
+          const qualification = applyBasicQualificationRules(
+            lead.email,
+            lead.phone,
+            lead.first_name,
+            lead.last_name
+          )
+
+          return {
             user_id: userData.user?.id,
             csv_upload_id: uploadData.id,
             source_type: 'csv_upload',
             source_filename: file.name,
             source_row_id: lead.row_id.toString(),
-            disposition: 'new',
-            tags: [],
+            disposition: qualification.disposition,
+            ai_score: qualification.score,
+            ai_qualification_reason: qualification.reasoning,
+            tags: qualification.tags,
             ...lead,
-          }))
-        )
+          }
+        })
+
+        const { error } = await supabase.from('leads').insert(qualifiedLeads)
 
         if (error) {
           console.error('Error inserting batch:', error)
