@@ -48,6 +48,11 @@ export default function LeadDetail() {
     setLoading(false)
   }
 
+  // Reload lead data after AI prediction actions
+  function handleAIAction() {
+    loadLead()
+  }
+
   if (loading) return <div>Loading...</div>
   if (!lead) return <div>Lead not found</div>
 
@@ -162,9 +167,9 @@ export default function LeadDetail() {
             score: lead.ai_score || 0,
             reasoning: lead.ai_qualification_reason || ''
           }}
-          onConfirm={() => console.log('Confirmed prediction')}
-          onEdit={(newDisposition, newScore) => console.log('Edit prediction:', newDisposition, newScore)}
-          onAddNote={(note) => console.log('Add note:', note)}
+          onConfirm={handleAIAction}
+          onEdit={handleAIAction}
+          onAddNote={handleAIAction}
         />
       )}
 

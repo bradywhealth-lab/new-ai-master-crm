@@ -13,7 +13,7 @@ export async function POST(
   }
 
   const leadId = params.id
-  const { newDisposition, newScore, smsLogId } = await request.json()
+  const { newDisposition, newScore, smsLogId, confirmOnly } = await request.json()
 
   // Get current lead to capture AI prediction
   const { data: lead } = await supabase
@@ -42,11 +42,13 @@ export async function POST(
     user_id: user.id,
     sms_log_id: smsLogId || null,
     ai_prediction: aiPrediction,
-    user_correction: {
-      disposition: newDisposition,
-      score: newScore
-    },
-    feedback_type: 'outcome_based'
+    user_correction: confirmOnly
+      ? null
+      : {
+          disposition: newDisposition,
+          score: newScore
+        },
+    feedback_type: confirmOnly ? 'prediction_confirmed' : 'outcome_based'
   }
 
   // Create feedback entry
@@ -59,28 +61,30 @@ export async function POST(
     return Response.json({ error: 'Failed to create feedback' }, { status: 500 })
   }
 
-  // Update lead disposition
-  const dispositionChange = {
-    from: lead.disposition,
-    to: newDisposition,
-    at: new Date().toISOString(),
-    triggered_by: 'user'
-  }
+  // Only update lead if disposition actually changed (not just confirming)
+  if (!confirmOnly && newDisposition !== lead.disposition) {
+    const dispositionChange = {
+      from: lead.disposition,
+      to: newDisposition,
+      at: new Date().toISOString(),
+      triggered_by: 'user'
+    }
 
-  const { error: updateError } = await supabase
-    .from('leads')
-    .update({
-      disposition: newDisposition,
-      ai_score: newScore,
-      previous_disposition: lead.disposition,
-      last_disposition_change: new Date().toISOString(),
-      disposition_changes: [...(lead.disposition_changes || []), dispositionChange]
-    })
-    .eq('id', leadId)
+    const { error: updateError } = await supabase
+      .from('leads')
+      .update({
+        disposition: newDisposition,
+        ai_score: newScore,
+        previous_disposition: lead.disposition,
+        last_disposition_change: new Date().toISOString(),
+        disposition_changes: [...(lead.disposition_changes || []), dispositionChange]
+      })
+      .eq('id', leadId)
 
-  if (updateError) {
-    console.error('Lead update error:', updateError)
-    return Response.json({ error: 'Failed to update lead' }, { status: 500 })
+    if (updateError) {
+      console.error('Lead update error:', updateError)
+      return Response.json({ error: 'Failed to update lead' }, { status: 500 })
+    }
   }
 
   return Response.json({ success: true, feedback: feedbackData })

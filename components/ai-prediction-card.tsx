@@ -40,14 +40,22 @@ export default function AIPredictionCard({
   async function handleConfirm() {
     setLoading(true)
     try {
-      await fetch(`/api/leads/${leadId}/feedback`, {
+      const response = await fetch(`/api/leads/${leadId}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           newDisposition: prediction.disposition,
-          newScore: prediction.score
+          newScore: prediction.score,
+          confirmOnly: true
         })
       })
+
+      if (!response.ok) {
+        const error = await response.json()
+        setMessage(`Failed to confirm: ${error.error || 'Unknown error'}`)
+        return
+      }
+
       setMessage('Prediction confirmed!')
       onConfirm?.()
     } catch (error) {
@@ -61,7 +69,7 @@ export default function AIPredictionCard({
   async function handleEditSave() {
     setLoading(true)
     try {
-      await fetch('/api/feedback/submit', {
+      const response = await fetch('/api/feedback/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -72,6 +80,13 @@ export default function AIPredictionCard({
           note: ''
         })
       })
+
+      if (!response.ok) {
+        const error = await response.json()
+        setMessage(`Failed to update: ${error.error || 'Unknown error'}`)
+        return
+      }
+
       setEditOpen(false)
       onEdit?.(editDisposition, editScore)
       setMessage('Prediction updated!')
@@ -86,7 +101,7 @@ export default function AIPredictionCard({
   async function handleAddNote() {
     setLoading(true)
     try {
-      await fetch('/api/feedback/submit', {
+      const response = await fetch('/api/feedback/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -96,7 +111,14 @@ export default function AIPredictionCard({
           new_score: undefined,
           note: note
         })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        setMessage(`Failed to add note: ${error.error || 'Unknown error'}`)
+        return
       }
+
       onAddNote?.(note)
       setNoteOpen(false)
       setNote('')

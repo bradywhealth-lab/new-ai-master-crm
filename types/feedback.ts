@@ -15,8 +15,8 @@ export interface FeedbackData {
   user_id: string
   sms_log_id: string | null
   ai_prediction: AIPrediction
-  user_correction: UserCorrection
-  feedback_type: 'outcome_based' | 'manual_review'
+  user_correction: UserCorrection | null
+  feedback_type: 'outcome_based' | 'manual_review' | 'prediction_confirmed'
 }
 
 export interface ReviewSubmission {
