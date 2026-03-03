@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import SMSThread from '@/components/sms-thread'
+import AIPredictionCard from '@/components/ai-prediction-card'
 
 interface Lead {
   id: string
@@ -151,6 +152,20 @@ export default function LeadDetail() {
           <p className="whitespace-pre-wrap">{lead.notes || 'No notes'}</p>
         </CardContent>
       </Card>
+
+      {/* AI Prediction Card */}
+      {lead.ai_score !== null && (
+        <AIPredictionCard
+          prediction={{
+            disposition: lead.disposition,
+            score: lead.ai_score || 0,
+            reasoning: lead.ai_qualification_reason || ''
+          }}
+          onConfirm={() => console.log('Confirmed prediction')}
+          onEdit={() => console.log('Edit prediction')}
+          onAddNote={(note) => console.log('Add note:', note)}
+        />
+      )}
 
       {/* SMS Thread */}
       <SMSThread leadId={leadId!} />
