@@ -102,7 +102,7 @@ export default function CSVUploader() {
         .update({
           status: 'completed',
           row_count: parsedLeads.length,
-        })
+        } as any)
         .eq('id', uploadData.id)
 
       if (updateError) throw updateError
