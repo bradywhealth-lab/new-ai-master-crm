@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
 import type { Lead } from '@/types/lead'
 
@@ -18,14 +19,20 @@ interface AnalyticsData {
 export default function AnalyticsDashboard() {
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [dateRange, setDateRange] = useState<'30' | '90' | 'all'>('30')
+  const [dispositionFilter, setDispositionFilter] = useState<string | null>(null)
 
   useEffect(() => {
     loadAnalytics()
-  }, [])
+  }, [dateRange, dispositionFilter])
 
   async function loadAnalytics() {
     try {
-      const response = await fetch('/api/analytics')
+      const params = new URLSearchParams()
+      if (dateRange !== '30') params.set('date_range', dateRange)
+      if (dispositionFilter) params.set('disposition', dispositionFilter)
+
+      const response = await fetch(`/api/analytics?${params.toString()}`)
       const result = await response.json()
       setData(result.data)
       setLoading(false)
@@ -52,6 +59,34 @@ export default function AnalyticsDashboard() {
   return (
     <div className="space-y-6">
       <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Analytics Overview</CardTitle>
+            <div className="flex gap-2">
+              <select
+                value={dateRange}
+                onChange={(e) => setDateRange(e.target.value as any)}
+                className="border rounded p-2 text-sm"
+              >
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
+                <option value="all">All Time</option>
+              </select>
+              <select
+                value={dispositionFilter || ''}
+                onChange={(e) => setDispositionFilter(e.target.value || null)}
+                className="border rounded p-2 text-sm"
+              >
+                <option value="">All Dispositions</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="qualified">Qualified</option>
+                <option value="proposal">Proposal</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+          </div>
+        </CardHeader>
         <CardHeader>
           <CardTitle>Analytics Overview</CardTitle>
         </CardHeader>

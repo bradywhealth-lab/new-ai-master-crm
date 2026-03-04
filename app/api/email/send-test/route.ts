@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import type { EmailTemplate } from '@/types/communications'
+import { sendEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   const supabase = createClient()
@@ -38,7 +39,14 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const toEmail = userProfile?.email || ''
+  const toEmail = userProfile?.email || userData?.user?.email || ''
+
+  // Send actual email
+  const emailResult = await sendEmail({
+    to: toEmail,
+    subject: `[TEST] ${template.subject}`,
+    text: template.body,
+  })
 
   // Create email log
   const { data: log, error: logError } = await supabase
@@ -49,8 +57,9 @@ export async function POST(request: NextRequest) {
       to_email: toEmail,
       subject: `[TEST] ${template.subject}`,
       body: template.body,
-      status: 'sent',
-      sent_at: new Date().toISOString()
+      status: emailResult.success ? 'sent' : 'failed',
+      error_message: emailResult.error || null,
+      sent_at: emailResult.success ? new Date().toISOString() : null,
     })
     .select()
     .single()
@@ -60,8 +69,10 @@ export async function POST(request: NextRequest) {
   }
 
   return Response.json({
-    success: true,
-    message: 'Test email logged successfully. Configure your email service to send actual emails.',
+    success: emailResult.success,
+    message: emailResult.success
+      ? 'Test email sent successfully!'
+      : `Failed to send email: ${emailResult.error}`,
     log: log
   })
 }

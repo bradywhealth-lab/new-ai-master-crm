@@ -8,10 +8,31 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { data: leads, error } = await supabase
+  // @ts-expect-error
+  const { searchParams } = new URLSearchParams(request.url)
+  const dateRange = searchParams.get('date_range') as '30' | '90' | 'all' | null
+  const dispositionFilter = searchParams.get('disposition') as string | null
+
+  // Build query with filters
+  let query = supabase
     .from('leads')
     .select('disposition, ai_score, created_at')
     .eq('user_id', user.id)
+
+  // Apply date filter
+  if (dateRange && dateRange !== 'all') {
+    const daysAgo = dateRange === '90' ? 90 : 30
+    const startDate = new Date()
+    startDate.setDate(startDate.getDate() - daysAgo)
+    query = query.gte('created_at', startDate.toISOString())
+  }
+
+  // Apply disposition filter
+  if (dispositionFilter) {
+    query = query.eq('disposition', dispositionFilter)
+  }
+
+  const { data: leads, error } = await query
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
