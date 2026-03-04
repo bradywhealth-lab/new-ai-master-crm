@@ -78,7 +78,7 @@ export default function CSVUploader() {
             source_filename: file.name,
             source_row_id: lead.row_id.toString(),
             disposition: qualification.disposition,
-            ai_score: qualification.score,
+            ai_score: qualification.aiScore,
             ai_qualification_reason: qualification.aiQualificationReason,
             tags: qualification.tags,
             ...lead,
