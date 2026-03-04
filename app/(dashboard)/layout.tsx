@@ -9,6 +9,10 @@ import { useState, useEffect } from 'react'
 const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/dashboard/leads', label: 'Leads' },
+  { href: '/dashboard/analytics', label: 'Analytics' },
+  { href: '/dashboard/calendar', label: 'Calendar' },
+  { href: '/dashboard/communications', label: 'Communications' },
+  { href: '/dashboard/reports', label: 'Reports' },
   { href: '/dashboard/uploads', label: 'Upload CSV' },
   { href: '/dashboard/scraping', label: 'Scraping' },
   { href: '/dashboard/social', label: 'Social' },

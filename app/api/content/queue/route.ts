@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { searchParams } = new URL(request.url).searchParams
+  const { searchParams } = new URLSearchParams(request.url)
   const status = searchParams.get('status') as string
 
   // Get content queue for this user

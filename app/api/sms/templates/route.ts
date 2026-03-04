@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import type { SocialPost, SocialPostCreate } from '@/types/social'
+import type { SmsTemplate, SmsTemplateCreate } from '@/types/communications'
 
 export async function GET(request: NextRequest) {
   const supabase = createClient()
@@ -9,32 +9,17 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { searchParams } = new URLSearchParams(request.url)
-  const platform = searchParams.get('platform') as string
-  const status = searchParams.get('status') as string
-
-  // Build query
-  let query = supabase
-    .from('social_posts')
+  const { data: templates, error } = await supabase
+    .from('sms_templates')
     .select('*')
     .eq('user_id', user.id)
-    .order('scheduled_for', { ascending: true })
-
-  if (platform) {
-    query = query.eq('platform', platform)
-  }
-
-  if (status) {
-    query = query.eq('status', status)
-  }
-
-  const { data: posts, error } = await query
+    .order('created_at', { ascending: false })
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
-  return Response.json({ data: posts as SocialPost[] })
+  return Response.json({ data: templates as SmsTemplate[] })
 }
 
 export async function POST(request: NextRequest) {
@@ -44,20 +29,21 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const body: SocialPostCreate = await request.json()
+  const body: SmsTemplateCreate = await request.json()
 
-  // Create social post
-  const { data: post, error } = await supabase
-    .from('social_posts')
+  // Extract variables from body
+  const variablePattern = /\{\{(\w+)\}\}/g
+  const variables = body.body.match(variablePattern)?.map(m => m.replace(/[{}]/g, '')) || null
+
+  const { data: template, error } = await supabase
+    .from('sms_templates')
     .insert({
       user_id: user.id,
-      platform: body.platform,
-      title: body.title || null,
-      content: body.content,
-      media_urls: body.media_urls || null,
-      scheduled_for: body.scheduled_for,
-      lead_ids: body.lead_ids || null,
-      status: 'scheduled'
+      name: body.name,
+      body: body.body,
+      category: body.category,
+      variables,
+      is_active: true
     })
     .select()
     .single()
@@ -66,7 +52,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
-  return Response.json({ data: post as SocialPost })
+  return Response.json({ data: template as SmsTemplate })
 }
 
 export async function DELETE(
@@ -79,12 +65,12 @@ export async function DELETE(
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id: postId } = await params
+  const { id: templateId } = await params
 
   const { error } = await supabase
-    .from('social_posts')
+    .from('sms_templates')
     .delete()
-    .eq('id', postId)
+    .eq('id', templateId)
 
   if (error) {
     return Response.json({ error: error.message }, { status: 500 })

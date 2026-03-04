@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -36,26 +36,34 @@ interface Lead {
 
 export default function LeadDetail() {
   const params = useParams()
-  const leadId = params.id
+  const leadId = (params.id || '') as string
   const [lead, setLead] = useState<Lead | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'followups' | 'appointments' | 'notes'>('overview')
   const supabase = createClient()
 
+  const loadLead = useCallback(async () => {
+    try {
+      const query = supabase.from('leads').select('*')
+      const filtered = (query as any).filter({ id: leadId })
+      const limited = filtered.limit(1)
+      const { data } = await limited
+      setLead(data && data.length > 0 ? data[0] as any : null)
+    } catch (error) {
+      console.error('Failed to load lead:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [leadId, supabase])
+
   useEffect(() => {
     loadLead()
-  }, [leadId])
-
-  async function loadLead() {
-    const { data } = await supabase.from('leads').select('*').eq('id', leadId).single() as any
-    setLead(data)
-    setLoading(false)
-  }
+  }, [leadId, loadLead])
 
   // Reload lead data after AI prediction actions
-  function handleAIAction() {
+  const handleAIAction = useCallback(() => {
     loadLead()
-  }
+  }, [loadLead])
 
   if (loading) return <div>Loading...</div>
   if (!lead) return <div>Lead not found</div>
@@ -180,7 +188,7 @@ export default function LeadDetail() {
       {activeTab === 'overview' && (
         <>
           {/* AI Prediction Card */}
-          {lead.ai_score !== null && (
+          {(lead as any).ai_score !== null && (
             <AIPredictionCard
               leadId={leadId!}
               prediction={{
