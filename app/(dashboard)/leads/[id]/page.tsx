@@ -40,10 +40,10 @@ export default function LeadDetail() {
   const [lead, setLead] = useState<Lead | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'followups' | 'appointments' | 'notes'>('overview')
-  const supabase = createClient()
 
   const loadLead = useCallback(async () => {
     try {
+      const supabase = createClient()
       const query = supabase.from('leads').select('*')
       const filtered = (query as any).filter({ id: leadId })
       const limited = filtered.limit(1)

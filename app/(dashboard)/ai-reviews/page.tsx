@@ -8,13 +8,12 @@ export default function AIReviewsPage() {
   const [leads, setLeads] = useState<any[]>([])
   const [filter, setFilter] = useState('all')
 
-  const supabase = createClient()
-
   useEffect(() => {
     loadLeads()
   }, [filter])
 
   async function loadLeads() {
+    const supabase = createClient()
     const { data: userData } = await supabase.auth.getUser()
 
     let query = supabase

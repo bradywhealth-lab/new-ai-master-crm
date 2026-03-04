@@ -29,9 +29,9 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
-  const supabase = createClient()
 
   useEffect(() => {
+    const supabase = createClient()
     // Check auth
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {

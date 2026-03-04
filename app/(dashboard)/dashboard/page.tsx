@@ -11,9 +11,8 @@ export default function DashboardPage() {
     todaySMS: 0,
   })
 
-  const supabase = createClient()
-
   useEffect(() => {
+    const supabase = createClient()
     async function loadStats() {
       // Get total leads
       const { count } = await supabase
