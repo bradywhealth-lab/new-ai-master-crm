@@ -1,18 +1,22 @@
 import { Twilio } from 'twilio'
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID
-const authToken = process.env.TWILIO_AUTH_TOKEN
-const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER
+function getTwilioClient() {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID
+  const authToken = process.env.TWILIO_AUTH_TOKEN
 
-if (!accountSid || !authToken) {
-  throw new Error('Twilio credentials not configured')
+  if (!accountSid || !authToken) {
+    throw new Error('Twilio credentials not configured')
+  }
+
+  return new Twilio(accountSid, authToken)
 }
-
-export const twilioClient = new Twilio(accountSid, authToken)
 
 export async function sendSMS(to: string, body: string) {
   try {
-    const message = await twilioClient.messages.create({
+    const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER
+    const client = getTwilioClient()
+
+    const message = await client.messages.create({
       from: twilioPhoneNumber!,
       to: to,
       body,
