@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
-import type { Lead } from '@/types/lead'
 
 interface AnalyticsData {
   leadsByDisposition: { name: string, value: number }[]
@@ -185,7 +184,7 @@ export default function AnalyticsDashboard() {
                 cy="50%"
                 cx="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
               >
                 {data.leadsByDisposition.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={dispositionColors[entry.name]} />

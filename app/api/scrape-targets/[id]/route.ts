@@ -15,6 +15,17 @@ export async function PATCH(
   const { id: targetId } = await params
   const body = await request.json()
 
+  // Verify ownership before update
+  const { data: existing } = await supabase
+    .from('scrape_targets')
+    .select('user_id')
+    .eq('id', targetId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   // Update scrape target
   const { data: target, error } = await supabase
     .from('scrape_targets')
@@ -44,6 +55,17 @@ export async function DELETE(
   }
 
   const { id: targetId } = await params
+
+  // Verify ownership before delete
+  const { data: existing } = await supabase
+    .from('scrape_targets')
+    .select('user_id')
+    .eq('id', targetId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   // Delete scrape target
   const { error } = await supabase

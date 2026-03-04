@@ -15,6 +15,17 @@ export async function PATCH(
   const { id: scheduleId } = await params
   const body = await request.json()
 
+  // Verify ownership before update
+  const { data: existing } = await supabase
+    .from('follow_up_schedules')
+    .select('user_id')
+    .eq('id', scheduleId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   // Update follow-up schedule
   const { data: schedule, error } = await supabase
     .from('follow_up_schedules')
@@ -45,6 +56,17 @@ export async function DELETE(
   }
 
   const { id: scheduleId } = await params
+
+  // Verify ownership before delete
+  const { data: existing } = await supabase
+    .from('follow_up_schedules')
+    .select('user_id')
+    .eq('id', scheduleId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   // Delete follow-up schedule
   const { error } = await supabase

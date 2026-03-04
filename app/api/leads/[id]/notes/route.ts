@@ -18,12 +18,17 @@ export async function POST(
   // Verify lead exists and belongs to user
   const { data: lead } = await supabase
     .from('leads')
-    .select('id')
+    .select('id, user_id')
     .eq('id', leadId)
     .single()
 
   if (!lead) {
     return Response.json({ error: 'Lead not found' }, { status: 404 })
+  }
+
+  // Verify ownership - user can only access their own leads
+  if (lead.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   // Create note
@@ -58,6 +63,17 @@ export async function GET(
   }
 
   const { id: leadId } = await params
+
+  // Verify lead ownership before fetching notes
+  const { data: lead } = await supabase
+    .from('leads')
+    .select('id, user_id')
+    .eq('id', leadId)
+    .single()
+
+  if (!lead || lead.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   // Get notes for this lead
   const { data: notes, error } = await supabase

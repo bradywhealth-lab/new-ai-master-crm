@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { searchParams } = new URLSearchParams(request.url)
-  const status = searchParams.get('status') as string
+  const url = new URL(request.url)
+  const status = url.searchParams.get('status') as string
 
   // Get content queue for this user
   let query = supabase
@@ -76,6 +76,17 @@ export async function PATCH(
   const { id: itemId } = await params
   const body = await request.json()
 
+  // Verify ownership before update
+  const { data: existing } = await supabase
+    .from('content_queue')
+    .select('user_id')
+    .eq('id', itemId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   // Update content queue item
   const { data: item, error } = await supabase
     .from('content_queue')
@@ -105,6 +116,17 @@ export async function DELETE(
   }
 
   const { id: itemId } = await params
+
+  // Verify ownership before delete
+  const { data: existing } = await supabase
+    .from('content_queue')
+    .select('user_id')
+    .eq('id', itemId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { error } = await supabase
     .from('content_queue')

@@ -8,10 +8,9 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // @ts-expect-error
-  const { searchParams } = new URLSearchParams(request.url)
-  const dateRange = searchParams.get('date_range') as '30' | '90' | 'all' | null
-  const dispositionFilter = searchParams.get('disposition') as string | null
+  const url = new URL(request.url)
+  const dateRange = url.searchParams.get('date_range') as '30' | '90' | 'all' | null
+  const dispositionFilter = url.searchParams.get('disposition') as string | null
 
   // Build query with filters
   let query = supabase

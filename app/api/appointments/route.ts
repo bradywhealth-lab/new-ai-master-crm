@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { searchParams } = new URLSearchParams(request.url)
-  const startDate = searchParams.get('start_date') as string
-  const endDate = searchParams.get('end_date') as string
+  const url = new URL(request.url)
+  const startDate = url.searchParams.get('start_date') as string
+  const endDate = url.searchParams.get('end_date') as string
 
   // Get all appointments
   let query = supabase

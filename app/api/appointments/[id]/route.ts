@@ -15,6 +15,17 @@ export async function PATCH(
   const { id: appointmentId } = await params
   const body = await request.json()
 
+  // Verify ownership before update
+  const { data: existing } = await supabase
+    .from('appointments')
+    .select('user_id')
+    .eq('id', appointmentId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   // Update appointment
   const { data: appointment, error } = await supabase
     .from('appointments')
@@ -45,6 +56,17 @@ export async function DELETE(
   }
 
   const { id: appointmentId } = await params
+
+  // Verify ownership before delete
+  const { data: existing } = await supabase
+    .from('appointments')
+    .select('user_id')
+    .eq('id', appointmentId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   // Delete appointment
   const { error } = await supabase

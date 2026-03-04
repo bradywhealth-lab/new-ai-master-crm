@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { template_id } = body
 
-  // Get template
+  // Get template and verify ownership
   const { data: template, error: templateError } = await supabase
     .from('email_templates')
     .select('*')
@@ -24,6 +24,11 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Template not found' }, { status: 404 })
   }
 
+  // Verify ownership - user can only use their own templates
+  if (template.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   // Get user's email for test (from profiles table)
   const { data: userProfile } = await supabase
     .from('profiles')
@@ -31,9 +36,10 @@ export async function POST(request: NextRequest) {
     .eq('id', user.id)
     .single()
 
+  let userData: any = null
   if (!userProfile || !userProfile.email) {
     // Fallback to auth email
-    const { data: userData } = await supabase.auth.admin.getUserById(user.id)
+    userData = await supabase.auth.admin.getUserById(user.id)
     if (!userData || !userData.user?.email) {
       return Response.json({ error: 'User email not found' }, { status: 404 })
     }

@@ -43,7 +43,7 @@ export default function CSVUploader() {
           user_id: userData.user?.id,
           filename: file.name,
           status: 'processing',
-        })
+        } as any)
         .select()
         .single()
 
@@ -78,7 +78,7 @@ export default function CSVUploader() {
             source_row_id: lead.row_id.toString(),
             disposition: qualification.disposition,
             ai_score: qualification.score,
-            ai_qualification_reason: qualification.reasoning,
+            ai_qualification_reason: qualification.aiQualificationReason,
             tags: qualification.tags,
             ...lead,
           }

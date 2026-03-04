@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Start scraping in background
-  startScrapeJob(job.id, target.id, target.url, target.selectors, user.id)
+  startScrapeJob(job.id, target.id, target.url, target.selectors, user.id, target.leads_found || 0)
 
   return Response.json({ data: job as ScrapeJob })
 }
@@ -65,7 +65,8 @@ async function startScrapeJob(
   targetId: string,
   url: string,
   selectors: any,
-  userId: string
+  userId: string,
+  targetLeadsFound: number
 ) {
   const supabase = createClient()
 
@@ -121,7 +122,7 @@ async function startScrapeJob(
       .from('scrape_targets')
       .update({
         last_scraped_at: new Date().toISOString(),
-        leads_found: (target.leads_found || 0) + leadsInserted
+        leads_found: targetLeadsFound + leadsInserted
       })
       .eq('id', targetId)
 

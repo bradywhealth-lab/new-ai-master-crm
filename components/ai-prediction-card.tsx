@@ -157,7 +157,7 @@ export default function AIPredictionCard({
             ✓ Confirm
           </Button>
           <Dialog open={editOpen} onOpenChange={setEditOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger>
               <Button size="sm" variant="outline">✏️ Edit</Button>
             </DialogTrigger>
             <DialogContent>
@@ -196,7 +196,7 @@ export default function AIPredictionCard({
           </Dialog>
 
           <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
-            <DialogTrigger asChild>
+            <DialogTrigger>
               <Button size="sm" variant="outline">📝 Add Note</Button>
             </DialogTrigger>
             <DialogContent>

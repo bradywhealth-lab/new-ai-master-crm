@@ -33,19 +33,20 @@ const Dialog = ({ open, onOpenChange, children, ...props }: DialogProps) => {
 
 const DialogTrigger = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentPropsWithoutRef<typeof Slot> & React.ComponentPropsWithoutRef<'button'>
+  React.ComponentPropsWithoutRef<typeof Slot> & React.ComponentPropsWithoutRef<'button'> & { asChild?: boolean }
 >(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, asChild, ...props }, ref) => {
     const { setOpen } = React.useContext(DialogContext)
+    const Comp = asChild ? Slot : 'button' as any
     return (
-      <Slot
+      <Comp
         ref={ref}
         className={cn('inline-flex items-center justify-center', className)}
         onClick={() => setOpen(true)}
         {...props}
       >
         {children}
-      </Slot>
+      </Comp>
     )
   }
 )

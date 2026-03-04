@@ -23,6 +23,11 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Lead not found' }, { status: 404 })
   }
 
+  // Verify ownership - user can only submit feedback for their own leads
+  if (lead.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const aiPrediction: AIPrediction = {
     disposition: lead.disposition,
     score: lead.ai_score || 0,

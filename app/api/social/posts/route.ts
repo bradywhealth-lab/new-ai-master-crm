@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { searchParams } = new URLSearchParams(request.url)
-  const platform = searchParams.get('platform') as string
-  const status = searchParams.get('status') as string
+  const url = new URL(request.url)
+  const platform = url.searchParams.get('platform') as string
+  const status = url.searchParams.get('status') as string
 
   // Build query
   let query = supabase
@@ -80,6 +80,17 @@ export async function DELETE(
   }
 
   const { id: postId } = await params
+
+  // Verify ownership before delete
+  const { data: existing } = await supabase
+    .from('social_posts')
+    .select('user_id')
+    .eq('id', postId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const { error } = await supabase
     .from('social_posts')

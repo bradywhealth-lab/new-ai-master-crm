@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import crypto from 'crypto'
 
 // Twilio webhook endpoint for receiving SMS
 export async function POST(request: NextRequest) {
@@ -12,6 +13,31 @@ export async function POST(request: NextRequest) {
 
     if (!from || !body) {
       return new NextResponse('Missing required fields', { status: 400 })
+    }
+
+    // Verify Twilio signature to prevent webhook spoofing
+    const url = request.url
+    const twilioSignature = request.headers.get('X-Twilio-Signature')
+    const authToken = process.env.TWILIO_AUTH_TOKEN
+
+    if (twilioSignature && authToken) {
+      const formDataString = Array.from(formData.entries())
+        .map(([key, value]) => `${key}${value}`)
+        .sort()
+        .join('')
+
+      const expectedSignature = crypto
+        .createHmac('sha1', authToken)
+        .update(Buffer.from(url + formDataString, 'utf-8'))
+        .digest('base64')
+
+      if (twilioSignature !== expectedSignature) {
+        console.error('Invalid Twilio signature - possible webhook spoofing attempt')
+        return new NextResponse('Unauthorized', { status: 401 })
+      }
+    } else if (process.env.NODE_ENV === 'production') {
+      console.error('Missing Twilio signature in production')
+      return new NextResponse('Unauthorized', { status: 401 })
     }
 
     const supabase = createServerSupabaseClient()

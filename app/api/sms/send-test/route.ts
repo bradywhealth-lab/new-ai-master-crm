@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { template_id } = body
 
-  // Get template
+  // Get template and verify ownership
   const { data: template, error: templateError } = await supabase
     .from('sms_templates')
     .select('*')
@@ -20,6 +20,11 @@ export async function POST(request: NextRequest) {
 
   if (templateError || !template) {
     return Response.json({ error: 'Template not found' }, { status: 404 })
+  }
+
+  // Verify ownership - user can only use their own templates
+  if (template.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   // Get user's phone number for test

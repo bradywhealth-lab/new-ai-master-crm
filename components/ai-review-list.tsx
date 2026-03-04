@@ -15,7 +15,7 @@ export default function AIReviewList({ leads }: AIReviewListProps) {
     setConfirmedIds(new Set(confirmedIds).add(leadId))
   }
 
-  const handleEdit = async (leadId: string, newDisposition?: string, newScore?: number) => {
+  const handleEdit = async (leadId: string, newDisposition: string | undefined, newScore: number | undefined) => {
     console.log('Edit prediction for:', leadId, { newDisposition, newScore })
     // The edit is handled by the AIPredictionCard component
   }
@@ -44,8 +44,8 @@ export default function AIReviewList({ leads }: AIReviewListProps) {
             leadId={lead.id}
             prediction={prediction}
             onConfirm={() => handleConfirm(lead.id)}
-            onEdit={handleEdit}
-            onAddNote={handleAddNote}
+            onEdit={(newDisposition, newScore) => handleEdit(lead.id, newDisposition, newScore)}
+            onAddNote={(note) => handleAddNote(lead.id, note)}
           />
         )
       })}

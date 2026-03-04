@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { searchParams } = new URLSearchParams(request.url)
-  const status = searchParams.get('status') as string
-  const limit = parseInt(searchParams.get('limit') || '50')
+  const url = new URL(request.url)
+  const status = url.searchParams.get('status') as string
+  const limit = parseInt(url.searchParams.get('limit') || '50')
 
   let query = supabase
     .from('email_logs')

@@ -15,6 +15,17 @@ export async function PATCH(
   const { id: noteId } = await params
   const body = await request.json()
 
+  // Verify ownership before update
+  const { data: existing } = await supabase
+    .from('lead_notes')
+    .select('user_id')
+    .eq('id', noteId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   // Update note
   const { data: note, error } = await supabase
     .from('lead_notes')
@@ -45,6 +56,17 @@ export async function DELETE(
   }
 
   const { id: noteId } = await params
+
+  // Verify ownership before delete
+  const { data: existing } = await supabase
+    .from('lead_notes')
+    .select('user_id')
+    .eq('id', noteId)
+    .single()
+
+  if (!existing || existing.user_id !== user.id) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   // Delete note
   const { error } = await supabase
