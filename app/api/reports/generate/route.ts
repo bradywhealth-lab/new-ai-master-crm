@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
   // In production, save PDF to storage or send as email attachment
   return Response.json({
     data: {
-      pdf_url: pdfBytes,
+      pdf_data: pdfBytes,
       csv: csvString
     }
   })

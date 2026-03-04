@@ -31,10 +31,11 @@ export default function ReportGenerator() {
       if (response.ok) {
         const result = await response.json()
 
-        if (format === 'pdf' && result.data.url) {
+        if (format === 'pdf' && result.data.pdf_data) {
           // Download PDF
+          const pdfData = result.data.pdf_data
           const link = document.createElement('a')
-          link.href = result.data.url
+          link.href = `data:application/pdf;base64,${pdfData}`
           link.download = `InsureAssist_Report_${dateRange}_${reportType}.pdf`
           link.click()
         } else {
