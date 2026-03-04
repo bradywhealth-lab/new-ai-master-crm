@@ -5,8 +5,10 @@ export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+  // During build time, environment variables aren't available
+  // Return a mock client that won't be used at build time
   if (!url || !key) {
-    throw new Error('Supabase URL and key are required')
+    return createBrowserClient<Database>('https://placeholder.com', 'placeholder-key')
   }
 
   return createBrowserClient<Database>(url, key)
