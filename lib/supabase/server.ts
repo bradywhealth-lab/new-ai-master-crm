@@ -4,24 +4,26 @@ import { Database } from './supabase/types'
 
 export function createClient() {
   const cookieStore = cookies()
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          cookieStore.set(name, value)
-        },
-        remove(name: string, options: any) {
-          cookieStore.delete(name)
-        },
+  if (!url || !key) {
+    throw new Error('Supabase URL and service key are required')
+  }
+
+  return createServerClient<Database>(url, key, {
+    cookies: {
+      get(name: string) {
+        return cookieStore.get(name)?.value
       },
-    }
-  )
+      set(name: string, value: string, options: any) {
+        cookieStore.set(name, value)
+      },
+      remove(name: string, options: any) {
+        cookieStore.delete(name)
+      },
+    },
+  })
 }
 
 export { createClient as createServerSupabaseClient }
