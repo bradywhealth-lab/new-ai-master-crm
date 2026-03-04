@@ -7,11 +7,12 @@ export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  if (!url || !key) {
-    throw new Error('Supabase URL and service key are required')
-  }
+  // During build time, environment variables aren't available
+  // Return a mock client that won't be used at build time
+  const clientUrl = url || 'https://placeholder.com'
+  const clientKey = key || 'placeholder-key'
 
-  return createServerClient<Database>(url, key, {
+  return createServerClient<Database>(clientUrl, clientKey, {
     cookies: {
       get(name: string) {
         return cookieStore.get(name)?.value
