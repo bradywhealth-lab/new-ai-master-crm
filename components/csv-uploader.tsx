@@ -85,7 +85,7 @@ export default function CSVUploader() {
           }
         })
 
-        const { error } = await supabase.from('leads').insert(qualifiedLeads)
+        const { error } = await supabase.from('leads').insert(qualifiedLeads as any)
 
         if (error) {
           console.error('Error inserting batch:', error)

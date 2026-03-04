@@ -33,7 +33,8 @@
       "Bash(npm run build 2>&1 | tail -30)",
       "Bash(npm run build 2>&1 | tail -5)",
       "Bash(curl -s http://localhost:3002/api/sms/webhook -X POST -d \"Body=Test\" -H \"Content-Type: application/x-www-form-urlencoded\" | head -c)",
-      "Bash(curl -s http://localhost:3002/api/analytics)"
+      "Bash(curl -s http://localhost:3002/api/analytics)",
+      "Bash(vercel --yes --prod)"
     ]
   },
   "outputStyle": "default"
