@@ -45,9 +45,10 @@ export default function CSVUploader() {
           status: 'processing',
         } as any)
         .select()
-        .single()
+        .single() as { data: { id: string } | null; error: any }
 
       if (uploadError) throw uploadError
+      if (!uploadData) throw new Error('Failed to create upload record')
       setUploadId(uploadData.id)
 
       // Parse CSV
