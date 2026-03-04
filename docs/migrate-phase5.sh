@@ -2,23 +2,24 @@
 
 # Phase 5 Database Migration Script
 # This script helps you migrate your Supabase database to Phase 5
-#
-# Instructions:
-# 1. Make sure you have Supabase CLI installed: npm install -g supabase
-# 2. Or run the SQL manually in your Supabase dashboard
 
 echo "==========================================="
 echo "Phase 5 Database Migration Instructions"
 echo "==========================================="
 echo ""
+
+echo "IMPORTANT: Use the ADAPTIVE migration file to avoid policy conflicts!"
+echo ""
+
 echo "Option 1: Run SQL manually (Recommended)"
-echo "  1. Go to https://supabase.com/dashboard/project/YOUR_PROJECT_ID/sql/new"
-echo "  2. Copy contents of docs/phase5-enhancements-database.sql"
-echo "  3. Paste and run the SQL"
+echo "  1. Go to https://supabase.com/dashboard"
+echo "  2. Select your project"
+echo "  3. Navigate to: Database > SQL Editor"
+echo "  4. Copy contents of docs/phase5-migration-adaptive.sql"
+echo "  5. Paste into the SQL Editor"
+echo "  6. Click Run button"
 echo ""
-echo "Option 2: Use Supabase CLI (if installed)"
-echo "  1. Run: cat docs/phase5-enhancements-database.sql | supabase db execute"
-echo ""
+
 echo "==========================================="
-echo "SQL File: docs/phase5-enhancements-database.sql"
+echo "SQL File: docs/phase5-migration-adaptive.sql (Recommended - uses adaptive SQL)"
 echo "==========================================="
