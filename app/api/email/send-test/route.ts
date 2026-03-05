@@ -4,7 +4,7 @@ import type { EmailTemplate } from '@/types/communications'
 import { sendEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })

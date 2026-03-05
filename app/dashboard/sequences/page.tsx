@@ -103,10 +103,9 @@ export default function SequencesPage() {
         <Button onClick={() => setShowCreateForm(true)}>New Sequence</Button>
       </div>
 
-      {/* Create Sequence Modal */}
       {showCreateForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowCreateForm(false)}>
-          <Card className="max-w-2xl w-full mx-4 p-6">
+          <Card className="max-w-2xl w-full mx-4 p-6" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-xl font-bold mb-4">Create New Sequence</h2>
 
             <div className="space-y-4 mb-4">
@@ -185,29 +184,28 @@ export default function SequencesPage() {
                           />
                         </div>
                       </div>
-                    </Card>
-                  ))}
+                    </div>
+                  </Card>
+                ))}
 
-                  <Button onClick={addStep} variant="outline" className="w-full">
-                    Add Step
-                  </Button>
-                </div>
-              </div>
-
-              <div className="flex gap-4 pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowCreateForm(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={createSequence}>
-                  Create Sequence
+                <Button onClick={addStep} variant="outline" className="w-full">
+                  Add Step
                 </Button>
               </div>
-            </Card>
-          </div>
+            </div>
+
+            <div className="flex gap-4 pt-4 border-t">
+              <Button variant="outline" onClick={() => setShowCreateForm(false)}>
+                Cancel
+              </Button>
+              <Button onClick={createSequence}>
+                Create Sequence
+              </Button>
+            </div>
+          </Card>
         </div>
       )}
 
-      {/* Sequences List */}
       {loading ? (
         <div className="text-center py-8">Loading sequences...</div>
       ) : sequences.length === 0 ? (

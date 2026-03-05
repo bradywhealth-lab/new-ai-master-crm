@@ -7,7 +7,7 @@ import { scrapeLeads, validateUrl } from '@/lib/scraper'
 const jobs = new Map<string, { status: string, startedAt: number }>()
 
 export async function POST(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -68,7 +68,7 @@ async function startScrapeJob(
   userId: string,
   targetLeadsFound: number
 ) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // Update job status to running
   await supabase
@@ -142,7 +142,7 @@ async function startScrapeJob(
 }
 
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })

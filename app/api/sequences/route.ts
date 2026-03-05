@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 // GET - List all sequences
 export async function GET(request: Request) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
 // POST - Create new sequence
 export async function POST(request: Request) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {

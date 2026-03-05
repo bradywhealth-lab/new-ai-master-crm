@@ -43,7 +43,11 @@
       "Bash(mv \"app/\\(dashboard\\)\" \"app/dashboard-backup\" && mkdir -p \"app/dashboard\" && cp -r \"app/dashboard-backup\"/* \"app/dashboard/\")",
       "Bash(curl -v http://localhost:3005/api/leads 2>&1 | head -30)",
       "Bash(curl -s http://localhost:3000/api/leads 2>&1 | head -20)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/activities && echo \" - /dashboard/activities\" && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/pipeline && echo \" - /dashboard/pipeline\" && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/sequences && echo \" - /dashboard/sequences\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/activities && echo \" - /dashboard/activities\" && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/pipeline && echo \" - /dashboard/pipeline\" && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/sequences && echo \" - /dashboard/sequences\")",
+      "Bash(lsof -ti:3000 | xargs kill -9 2>/dev/null || true)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/)",
+      "mcp__plugin_supabase_supabase__execute_sql",
+      "mcp__plugin_supabase_supabase__get_advisors"
     ]
   },
   "outputStyle": "default"

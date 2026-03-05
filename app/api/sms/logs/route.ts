@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { SmsLog } from '@/types/communications'
 
 export async function GET(request: NextRequest) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })

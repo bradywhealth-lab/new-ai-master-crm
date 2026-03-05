@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@supabase/ssr'
-import { Database } from './supabase/types'
+import { Database } from './types'
 
 export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL

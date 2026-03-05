@@ -15,6 +15,11 @@ interface AIPredictionCardProps {
   onAddNote: (note: string) => void
 }
 
+const helpfulColors: Record<string, string> = {
+  helpful: 'bg-green-500 hover:bg-green-600',
+  not_helpful: 'bg-red-500 hover:bg-red-600',
+}
+
 export default function AIPredictionCard({
   prediction,
   leadId,
@@ -155,6 +160,52 @@ export default function AIPredictionCard({
         <div className="flex gap-2 pt-2">
           <Button onClick={handleConfirm} size="sm" variant="default" disabled={loading}>
             ✓ Confirm
+          </Button>
+          <Button
+            onClick={async () => {
+              await fetch('/api/feedback/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  lead_id: leadId,
+                  ai_prediction_confirmed: false,
+                  new_disposition: undefined,
+                  new_score: undefined,
+                  note: 'Helpful - quick feedback',
+                  feedback_type: 'outcome_based',
+                })
+              })
+              setMessage('Thanks for your feedback!')
+              setTimeout(() => setMessage(''), 2000)
+            }}
+            size="sm"
+            className={helpfulColors.helpful}
+            disabled={loading}
+          >
+            👍 Helpful
+          </Button>
+          <Button
+            onClick={async () => {
+              await fetch('/api/feedback/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  lead_id: leadId,
+                  ai_prediction_confirmed: false,
+                  new_disposition: undefined,
+                  new_score: undefined,
+                  note: 'Not helpful - quick feedback',
+                  feedback_type: 'outcome_based',
+                })
+              })
+              setMessage('Thanks for your feedback!')
+              setTimeout(() => setMessage(''), 2000)
+            }}
+            size="sm"
+            className={helpfulColors.not_helpful}
+            disabled={loading}
+          >
+            👎 Not Helpful
           </Button>
           <Dialog open={editOpen} onOpenChange={setEditOpen}>
             <DialogTrigger>
