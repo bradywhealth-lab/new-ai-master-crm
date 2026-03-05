@@ -8,6 +8,9 @@ import { useState, useEffect } from 'react'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
+  { href: '/dashboard/activities', label: 'Activities' },
+  { href: '/dashboard/pipeline', label: 'Pipeline' },
+  { href: '/dashboard/sequences', label: 'Sequences' },
   { href: '/dashboard/leads', label: 'Leads' },
   { href: '/dashboard/analytics', label: 'Analytics' },
   { href: '/dashboard/calendar', label: 'Calendar' },

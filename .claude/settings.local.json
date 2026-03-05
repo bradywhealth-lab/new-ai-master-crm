@@ -34,7 +34,16 @@
       "Bash(npm run build 2>&1 | tail -5)",
       "Bash(curl -s http://localhost:3002/api/sms/webhook -X POST -d \"Body=Test\" -H \"Content-Type: application/x-www-form-urlencoded\" | head -c)",
       "Bash(curl -s http://localhost:3002/api/analytics)",
-      "Bash(vercel --yes --prod)"
+      "Bash(vercel --yes --prod)",
+      "Bash(curl -s http://localhost:3003/dashboard/leads | head -50)",
+      "Bash(ls -la \"app/\\(dashboard\\)/\")",
+      "Bash(ls -la \"app/\\(dashboard\\)/dashboard/\")",
+      "Bash(curl -s http://localhost:3003/dashboard/leads 2>&1 | grep -i \"error\" | head -10)",
+      "Bash(NODE_OPTIONS='--no-experimental-loader' next dev --turbo=false 2>&1 | head -20)",
+      "Bash(mv \"app/\\(dashboard\\)\" \"app/dashboard-backup\" && mkdir -p \"app/dashboard\" && cp -r \"app/dashboard-backup\"/* \"app/dashboard/\")",
+      "Bash(curl -v http://localhost:3005/api/leads 2>&1 | head -30)",
+      "Bash(curl -s http://localhost:3000/api/leads 2>&1 | head -20)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/activities && echo \" - /dashboard/activities\" && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/pipeline && echo \" - /dashboard/pipeline\" && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/dashboard/sequences && echo \" - /dashboard/sequences\")"
     ]
   },
   "outputStyle": "default"
