@@ -48,6 +48,9 @@ export default function LeadList() {
   const [selectAll, setSelectAll] = useState(false)
   const [showBulkSMSDialog, setShowBulkSMSDialog] = useState(false)
   const [bulkSMSMessage, setBulkSMSMessage] = useState('')
+  const [showBulkEmailDialog, setShowBulkEmailDialog] = useState(false)
+  const [bulkEmailSubject, setBulkEmailSubject] = useState('')
+  const [bulkEmailMessage, setBulkEmailMessage] = useState('')
 
   const supabase = createClient()
 
@@ -140,6 +143,46 @@ export default function LeadList() {
     }
   }
 
+  const handleBulkEmail = async () => {
+    if (selectedLeads.size === 0) {
+      alert('Please select at least one lead')
+      return
+    }
+    if (!bulkEmailSubject.trim() || !bulkEmailMessage.trim()) {
+      alert('Please enter a subject and message')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/leads/bulk-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          leadIds: Array.from(selectedLeads),
+          subject: bulkEmailSubject,
+          message: bulkEmailMessage
+        })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        alert(`Failed: ${result.error || 'Unknown error'}`)
+        return
+      }
+
+      alert(`Email sent to ${result.sent || 0} leads, ${result.failed || 0} failed`)
+      setShowBulkEmailDialog(false)
+      setBulkEmailSubject('')
+      setBulkEmailMessage('')
+      setSelectedLeads(new Set())
+      setSelectAll(false)
+    } catch (error) {
+      console.error('Bulk email error:', error)
+      alert('Failed to send email')
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -148,6 +191,9 @@ export default function LeadList() {
           <div className="flex gap-2">
             <Button onClick={() => setShowBulkSMSDialog(true)} size="sm">
               📱 Send SMS ({selectedLeads.size})
+            </Button>
+            <Button onClick={() => setShowBulkEmailDialog(true)} size="sm" variant="outline">
+              ✉️ Send Email ({selectedLeads.size})
             </Button>
           </div>
         )}
@@ -294,6 +340,49 @@ export default function LeadList() {
               </Button>
               <Button onClick={handleBulkSMS}>
                 Send SMS
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Bulk Email Dialog */}
+      {showBulkEmailDialog && (
+        <Dialog open={showBulkEmailDialog} onOpenChange={setShowBulkEmailDialog}>
+          <DialogContent className="max-w-md">
+            <h2 className="text-lg font-semibold mb-4">Send Bulk Email</h2>
+            <div className="space-y-4 py-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-2">
+                  This will send email to {selectedLeads.size} selected lead(s) with valid email addresses
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Subject</label>
+                <Input
+                  value={bulkEmailSubject}
+                  onChange={(e) => setBulkEmailSubject(e.target.value)}
+                  placeholder="Enter subject..."
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Message</label>
+                <textarea
+                  value={bulkEmailMessage}
+                  onChange={(e) => setBulkEmailMessage(e.target.value)}
+                  placeholder="Enter your message... Use {firstName} and {lastName} for personalization"
+                  rows={6}
+                  className="w-full border rounded-md p-3"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 justify-end pt-4 border-t">
+              <Button onClick={() => setShowBulkEmailDialog(false)} variant="outline">
+                Cancel
+              </Button>
+              <Button onClick={handleBulkEmail}>
+                Send Email
               </Button>
             </div>
           </DialogContent>
