@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse dates
-    const start = startDate ? new Date(startDate) : new Date()
-    const end = endDate ? new Date(endDate) : new Date()
+    let start = startDate ? new Date(startDate) : new Date()
+    let end = endDate ? new Date(endDate) : new Date()
     const duration = durationMinutes || 60
 
     // If specific date is provided, set the range
