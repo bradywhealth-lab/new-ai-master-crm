@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   const endDate = searchParams.get('end_date')
 
   let query = supabase
-    .from('activities')
+    .from('activity_log')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(100)
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
   const { lead_id, activity_type, description, metadata } = body
 
   const { data, error } = await supabase
-    .from('activities')
+    .from('activity_log')
     .insert({
       user_id: user.id,
       lead_id,
