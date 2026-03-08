@@ -2,13 +2,14 @@ import puppeteer, { Page, Browser } from 'puppeteer'
 import type { ScraperConfig } from '@/types/scraping'
 
 // Simple CSS/XPath selector extractor
+// Phone is now MANDATORY for scraped leads
 export async function scrapeLeads(
   url: string,
   selectors: {
     first_name?: string
     last_name?: string
     email?: string
-    phone?: string
+    phone: string,
     address?: string
     city?: string
     state?: string
