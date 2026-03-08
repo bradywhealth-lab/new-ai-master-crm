@@ -124,7 +124,7 @@ export async function scrapeLeads(
           lead.zip = extractedData.zip
         }
 
-        if (lead.first_name || lead.last_name || lead.email || lead.phone) {
+        if (lead.phone) {
           leads.push(lead)
         }
       }
@@ -141,7 +141,7 @@ export async function scrapeLeads(
         zip: extractedData.zip
       }
 
-      if (lead.first_name || lead.last_name || lead.email || lead.phone) {
+      if (lead.phone) {
         leads.push(lead)
       }
     }
