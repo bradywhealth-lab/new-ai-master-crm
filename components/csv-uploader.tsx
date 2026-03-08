@@ -89,7 +89,12 @@ export default function CSVUploader() {
 
         if (error) {
           console.error('Error inserting batch:', error)
-          throw error
+
+          // Show which lead in the batch failed
+          const failedLeadIndex = i / batchSize
+          const failedLead = batch[failedLeadIndex] || {}
+
+          throw new Error(`Failed to insert batch starting at lead #${failedLeadIndex + 1}: ${error.message}`)
         }
 
         setProgress(40 + (i / parsedLeads.length) * 50)
