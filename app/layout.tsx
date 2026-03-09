@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -12,11 +11,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Try to import SpeedInsights, but don't fail if it's not available
+  const SpeedInsightsComponent = (() => {
+    try {
+      const { SpeedInsights } = require('@vercel/speed-insights/next')
+      return <SpeedInsights />
+    } catch (e) {
+      // Module not available, skip it
+      return null
+    }
+  })()
+
   return (
     <html lang="en">
       <body className="antialiased">
         {children}
-        <SpeedInsights />
+        {SpeedInsightsComponent}
       </body>
     </html>
   )
