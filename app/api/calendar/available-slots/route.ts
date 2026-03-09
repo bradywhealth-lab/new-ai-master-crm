@@ -1,99 +1,81 @@
+import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
-import { findAvailableSlots, checkSlotAvailability } from '@/lib/google-calendar'
-
-export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { calendarId, startDate, endDate, durationMinutes, date } = await request.json()
-
-    if (!calendarId) {
-      return NextResponse.json({ error: 'Missing required field: calendarId' }, { status: 400 })
-    }
-
-    // Parse dates
-    let start = startDate ? new Date(startDate) : new Date()
-    let end = endDate ? new Date(endDate) : new Date()
-    const duration = durationMinutes || 60
-
-    // If specific date is provided, set the range
-    if (date) {
-      const targetDate = new Date(date)
-      targetDate.setHours(9)
-      targetDate.setMinutes(0)
-      targetDate.setSeconds(0)
-      targetDate.setMilliseconds(0)
-      start = new Date(targetDate)
-      end = new Date(targetDate.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days out
-    }
-
-    // Find available slots
-    const slots = await findAvailableSlots(calendarId, duration, start, end)
-
-    // Filter slots to only show business hours (9 AM - 5 PM, weekdays)
-    const businessSlots = slots.filter(slot => {
-      const slotDate = new Date(slot.start)
-      return (
-        slotDate.getDay() !== 0 && // Not Sunday
-        slotDate.getDay() !== 6 && // Not Saturday
-        slotDate.getHours() >= 9 &&
-        slotDate.getHours() < 17
-      )
-    })
-
-    return NextResponse.json({ success: true, data: { slots: businessSlots } })
-  } catch (error) {
-    console.error('Error finding available slots:', error)
-    return NextResponse.json(
-      { error: 'Failed to find available slots', details: (error as Error).message },
-      { status: 500 }
-    )
-  }
-}
 
 export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const { calendarId } = await request.json?.data || {}
-
-    if (!calendarId) {
-      return NextResponse.json({ error: 'Missing required field: calendarId' }, { status: 400 })
-    }
-
-    // Check if a specific time slot is available
-    const { startTime, endTime } = await request.json?.data || {}
-
-    if (!startTime || !endTime) {
-      return NextResponse.json(
-        { error: 'Missing required fields: startTime, endTime' },
-        { status: 400 }
-      )
-    }
-
-    const available = await checkSlotAvailability(
-      calendarId,
-      new Date(startTime),
-      new Date(endTime)
-    )
-
-    return NextResponse.json({ success: true, data: { available } })
-  } catch (error) {
-    console.error('Error checking availability:', error)
-    return NextResponse.json(
-      { error: 'Failed to check availability', details: (error as Error).message },
-      { status: 500 }
-    )
+  if (!user) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
+
+  const url = new URL(request.url)
+  const duration = parseInt(url.searchParams.get('duration') || '60', 10)
+  const startDate = url.searchParams.get('start_date') as string
+  const endDate = url.searchParams.get('end_date') as string
+
+  // Calculate time range for slot search
+  const start = startDate ? new Date(startDate) : new Date()
+  const end = endDate ? new Date(endDate) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
+
+  // Get existing appointments to block out times
+  const { data: appointments } = await supabase
+    .from('appointments')
+    .select('start_time, end_time')
+    .eq('user_id', user.id)
+    .gte('start_time', start.toISOString())
+    .lt('end_time', end.toISOString())
+    .eq('status', 'scheduled')
+
+  // Generate available slots (business hours: 9 AM - 5 PM)
+  const availableSlots = []
+  const businessHoursStart = 9 // 9 AM
+  const businessHoursEnd = 17 // 5 PM
+  const slotDuration = duration // minutes
+
+  let currentDate = new Date(start)
+  currentDate.setHours(businessHoursStart, 0, 0, 0)
+
+  while (currentDate < end) {
+    // Skip weekends (Saturday = 6, Sunday = 0)
+    if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
+      // Generate hourly slots during business hours
+      let hour = businessHoursStart
+      while (hour < businessHoursEnd) {
+        const slotStart = new Date(currentDate)
+        slotStart.setHours(hour, 0, 0, 0)
+
+        const slotEnd = new Date(slotStart)
+        slotEnd.setMinutes(slotStart.getMinutes() + slotDuration)
+
+        // Check if this slot conflicts with existing appointments
+        const isAvailable = !appointments?.some(apt => {
+          const aptStart = new Date(apt.start_time)
+          const aptEnd = new Date(apt.end_time)
+          return slotStart < aptEnd && slotEnd > aptStart
+        })
+
+        if (isAvailable) {
+          availableSlots.push({
+            start: slotStart.toISOString(),
+            end: slotEnd.toISOString(),
+            label: slotStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+          })
+        }
+
+        hour += 1
+      }
+    }
+
+    // Move to next day
+    currentDate.setDate(currentDate.getDate() + 1)
+    currentDate.setHours(businessHoursStart, 0, 0, 0)
+  }
+
+  return Response.json({
+    slots: availableSlots,
+    start_date: start.toISOString(),
+    end_date: end.toISOString(),
+    duration
+  })
 }
