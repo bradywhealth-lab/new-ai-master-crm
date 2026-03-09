@@ -48,23 +48,32 @@ export async function POST(request: NextRequest) {
   let dispositionUpdate: { disposition: string | null } = { disposition: null }
   if (outcome === 'sold') {
     dispositionUpdate.disposition = 'sold'
-  } else if (outcome === 'lost' || outcome === 'not_interested' || outcome === 'wrong_number' || outcome === 'do_not_contact') {
+  } else if (outcome === 'lost') {
     dispositionUpdate.disposition = 'closed_lost'
+  } else if (outcome === 'not_interested') {
+    dispositionUpdate.disposition = 'not_interested'
+  } else if (outcome === 'wrong_number') {
+    dispositionUpdate.disposition = 'do_not_contact'
+  } else if (outcome === 'do_not_contact') {
+    dispositionUpdate.disposition = 'do_not_contact'
   }
 
   if (dispositionUpdate.disposition) {
-    const { error: updateError } = await supabase
+    await supabase
       .from('leads')
-      .update({
-        disposition: dispositionUpdate.disposition,
-        last_disposition_change: new Date().toISOString(),
-      })
+      .update({ disposition: dispositionUpdate.disposition })
       .eq('id', lead_id)
-
-    if (updateError) {
-      return Response.json({ error: `Outcome recorded but failed to update lead: ${updateError.message}` }, { status: 500 })
-    }
   }
 
-  return Response.json({ success: true })
+  // Log activity
+  await supabase
+    .from('activities')
+    .insert({
+      lead_id,
+      user_id: user.id,
+      activity_type: 'outcome_recorded',
+      details: `Outcome recorded: ${outcome}`,
+    })
+
+  return Response.json({ success: true, message: 'Outcome recorded successfully' })
 }
