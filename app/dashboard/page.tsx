@@ -9,8 +9,6 @@ import {
   TrendingUp,
   TrendingDown,
   MessageSquare,
-  BarChart,
-  Calendar,
   Activity,
   Bell,
   Plus
@@ -54,10 +52,10 @@ export default function DashboardPage() {
         return <Users className="w-5 h-5 text-blue-500" />
       case 'sms_sent':
         return <MessageSquare className="w-5 h-5 text-green-500" />
+      case 'appointment':
+        return <Activity className="w-5 h-5 text-purple-500" />
       case 'email_sent':
         return <Activity className="w-5 h-5 text-primary" />
-      case 'appointment':
-        return <Calendar className="w-5 h-5 text-purple-500" />
       default:
         return <Activity className="w-5 h-5 text-gray-500" />
     }
@@ -93,14 +91,14 @@ export default function DashboardPage() {
                 -3%
               </div>
             ) : (
-              <div className="text-gray-400 text-sm font-medium">
+              <div className="text-gray-400 text-sm font-medium ml-2">
                 0%
               </div>
             )}
+            <div className="text-3xl font-bold text-foreground">
+              {value.toLocaleString()}
+            </div>
           </div>
-        </div>
-        <div className="text-3xl font-bold text-foreground">
-          {value.toLocaleString()}
         </div>
       </CardContent>
     </Card>
@@ -117,13 +115,10 @@ export default function DashboardPage() {
               <p className="text-white/90">Elite CRM - Your Insurance Command Center</p>
             </div>
             <div className="flex items-center gap-4">
-              <Bell className="w-6 h-6 text-white/90" />
+              <Bell className="w-6 h-6 text-white" />
               <button className="relative p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary font-bold">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary font-bold text-xl">
                   JD
-                </div>
-                <div className="hidden md:block text-sm text-white/90">
-                  John Doe
                 </div>
                 <span className="absolute top-0 right-0 w-3 h-3 bg-destructive rounded-full text-white text-xs flex items-center justify-center">
                   3
@@ -148,7 +143,7 @@ export default function DashboardPage() {
             title="Hot Leads"
             value={stats.hotLeads}
             trend="up"
-            icon={<BarChart className="w-6 h-6 text-orange-500" />}
+            icon={<TrendingUp className="w-6 h-6 text-orange-500" />}
           />
           <StatCard
             title="SMS This Week"
@@ -165,7 +160,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Two Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Quick Actions - Spans 2 columns */}
           <div className="lg:col-span-2">
             <Card className="border border-border-light rounded-lg bg-card hover:shadow-lg transition-all">
@@ -187,7 +182,7 @@ export default function DashboardPage() {
                     Send Bulk Email
                   </Button>
                   <Button variant="secondary" className="h-12 justify-start text-primary font-medium">
-                    <Activity className="w-5 h-5 mr-2" />
+                    <Plus className="w-5 h-5 mr-2" />
                     Import CSV
                   </Button>
                 </div>
@@ -208,38 +203,36 @@ export default function DashboardPage() {
                       key={index}
                       className="flex items-start gap-3 p-3 rounded border border-border-light hover:bg-hover transition-colors"
                     >
-                      {getActivityIcon(activity.type)}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground">
                           {activity.message}
                         </p>
-                        <p className="text-xs text-foreground-muted mt-0.5">
+                        <p className="text-xs text-foreground-muted">
                           {activity.time}
                         </p>
                       </div>
+                      {getActivityIcon(activity.type)}
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
           </div>
+        </div>
 
         {/* Trend Chart Placeholder */}
-          <Card className="border border-border-light rounded-lg bg-card hover:shadow-lg transition-all">
-            <CardHeader>
-              <CardTitle>Lead Trends</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-foreground-muted">
-                <BarChart className="w-12 h-12 mx-auto text-primary/20" />
-                <p className="mt-4 text-sm text-foreground-secondary">Lead distribution by disposition</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="border border-border-light rounded-lg bg-card hover:shadow-lg transition-all">
+          <CardHeader>
+            <CardTitle>Lead Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-12 text-foreground-muted">
+              <BarChart className="w-12 h-12 mx-auto text-primary/20" />
+              <p className="mt-4 text-sm text-foreground-secondary">Lead distribution by disposition</p>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )
 }
-
-// Trigger fresh build - $(date)
