@@ -49,10 +49,13 @@ interface Lead {
 
 const dispositionConfig = [
   { value: 'all', label: 'All Dispositions' },
-  { value: 'new', label: 'New', color: 'default' },
-  { value: 'hot', label: 'Hot', color: 'destructive' },
-  { value: 'nurture', label: 'Nurture', color: 'secondary' },
-  { value: 'sold', label: 'Sold', color: 'success' },
+  { value: 'new', label: 'New' },
+  { value: 'hot', label: 'Hot' },
+  { value: 'nurture', label: 'Nurture' },
+  { value: 'sold', label: 'Sold' },
+  { value: 'qualified', label: 'Qualified' },
+  { value: 'proposal', label: 'Proposal' },
+  { value: 'negotiation', label: 'Negotiation' },
 ]
 
 const sourceConfig = [
@@ -67,11 +70,11 @@ const sourceConfig = [
 ]
 
 const getScoreColor = (score: number) => {
-  if (score >= 90) return 'text-green-500'
-  if (score >= 80) return 'text-blue-500'
-  if (score >= 70) return 'text-yellow-500'
-  if (score >= 60) return 'text-orange-500'
-  return 'text-red-500'
+  if (score >= 90) return 'text-success'
+  if (score >= 80) return 'text-primary'
+  if (score >= 70) return 'text-warning'
+  if (score >= 60) return 'text-info'
+  return 'text-destructive'
 }
 
 const getScoreLabel = (score: number) => {
@@ -80,6 +83,19 @@ const getScoreLabel = (score: number) => {
   if (score >= 70) return 'Qualified'
   if (score >= 60) return 'Warm'
   return 'Cold'
+}
+
+const getDispositionBadgeColor = (disposition: string) => {
+  switch (disposition) {
+    case 'sold': return 'bg-success text-success-foreground'
+    case 'hot': return 'bg-destructive text-destructive-foreground'
+    case 'nurture': return 'bg-secondary text-secondary-foreground'
+    case 'qualified': return 'bg-primary text-primary-foreground'
+    case 'new': return 'bg-muted text-foreground-secondary'
+    case 'proposal': return 'bg-info text-info-foreground'
+    case 'negotiation': return 'bg-warning text-warning-foreground'
+    default: return 'bg-muted text-foreground-secondary'
+  }
 }
 
 export default function LeadList() {
@@ -231,20 +247,20 @@ export default function LeadList() {
 
   return (
     <div className="min-h-screen bg-background p-6">
-      {/* Header with Bulk Actions */}
+      {/* Elite Header */}
       <div className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Leads</h1>
-            <p className="text-sm text-muted-foreground">Manage your pipeline with AI-qualified prospects</p>
+            <p className="text-sm text-foreground-secondary">Manage your pipeline with AI-qualified prospects</p>
           </div>
           {selectedLeads.size > 0 && (
             <div className="flex gap-2">
-              <Button onClick={() => setShowBulkSMSDialog(true)} size="sm">
+              <Button onClick={() => setShowBulkSMSDialog(true)} size="sm" className="btn-elite-primary">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 SMS ({selectedLeads.size})
               </Button>
-              <Button onClick={() => setShowBulkEmailDialog(true)} size="sm" variant="secondary">
+              <Button onClick={() => setShowBulkEmailDialog(true)} size="sm" className="btn-elite-secondary">
                 <Mail className="w-4 h-4 mr-2" />
                 Email ({selectedLeads.size})
               </Button>
@@ -253,17 +269,17 @@ export default function LeadList() {
         </div>
       </div>
 
-      {/* Filters Toolbar */}
-      <Card className="mb-6">
+      {/* Elite Filters Toolbar */}
+      <Card className="card-elite mb-6">
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
             <Input
               placeholder="Search by name, email, or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1"
+              className="input-elite flex-1"
               icon={
-                <div className="absolute right-3 text-muted-foreground">
+                <div className="absolute right-3 text-foreground-muted">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-1-1 0 0 10 5" />
                   </svg>
@@ -273,7 +289,7 @@ export default function LeadList() {
             <select
               value={dispositionFilter}
               onChange={(e) => setDispositionFilter(e.target.value)}
-              className="flex-1"
+              className="input-elite flex-1"
             >
               <option value="all">All Dispositions</option>
               {dispositionConfig.map((opt) => (
@@ -283,7 +299,7 @@ export default function LeadList() {
             <select
               value={sourceFilter}
               onChange={(e) => setSourceFilter(e.target.value)}
-              className="flex-1"
+              className="input-elite flex-1"
             >
               <option value="all">All Sources</option>
               {sourceConfig.map((opt) => (
@@ -294,12 +310,12 @@ export default function LeadList() {
         </CardContent>
       </Card>
 
-      {/* Table */}
-      <Card className="table-container">
-        <Table>
+      {/* Elite Table */}
+      <Card className="card-elite table-container">
+        <Table className="table-elite">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-10">
+              <TableHead className="table-header-elite w-10 px-4">
                 <input
                   type="checkbox"
                   checked={selectAll && leads.length > 0}
@@ -307,15 +323,15 @@ export default function LeadList() {
                   className="w-4 h-4"
                 />
               </TableHead>
-              <TableHead>Lead</TableHead>
-              <TableHead className="hidden md:table-cell">Email</TableHead>
-              <TableHead className="hidden md:table-cell">Phone</TableHead>
-              <TableHead>Score</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="hidden md:table-cell">Source</TableHead>
-              <TableHead className="hidden md:table-cell">Tags</TableHead>
-              <TableHead>Last Activity</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="px-4">Lead</TableHead>
+              <TableHead className="hidden md:table-cell px-4">Email</TableHead>
+              <TableHead className="hidden md:table-cell px-4">Phone</TableHead>
+              <TableHead className="px-4">AI Score</TableHead>
+              <TableHead className="px-4">Status</TableHead>
+              <TableHead className="hidden md:table-cell px-4">Source</TableHead>
+              <TableHead className="hidden md:table-cell px-4">Tags</TableHead>
+              <TableHead className="px-4">Last Activity</TableHead>
+              <TableHead className="px-4">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -339,9 +355,9 @@ export default function LeadList() {
               leads.map((lead, index) => (
                 <TableRow
                   key={lead.id}
-                  className={index % 2 === 0 ? 'bg-muted/30' : ''}
+                  className={`table-row-elite ${index % 2 === 0 ? 'bg-hover/50' : ''}`}
                 >
-                  <TableCell className="w-10">
+                  <TableCell className="w-10 px-4">
                     <input
                       type="checkbox"
                       checked={selectedLeads.has(lead.id)}
@@ -349,20 +365,20 @@ export default function LeadList() {
                       className="w-4 h-4"
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4">
                     <div className="flex items-start gap-3">
-                      <div className="font-medium">
+                      <div className="font-medium text-foreground">
                         {lead.first_name} {lead.last_name}
                       </div>
-                      <div className="md:hidden text-xs text-muted-foreground">
-                        {lead.email || <span className="text-red-500">No email</span>}
+                      <div className="md:hidden text-xs text-foreground-secondary">
+                        {lead.email || <span className="text-destructive">No email</span>}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {lead.phone || <span className="text-red-500">No phone</span>}
+                  <TableCell className="hidden md:table-cell px-4">
+                    {lead.phone || <span className="text-destructive">No phone</span>}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4">
                     {/* AI Score Badge */}
                     <div className="flex items-center gap-2">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${getScoreColor(lead.ai_score || 0)}`}>
@@ -375,17 +391,15 @@ export default function LeadList() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={lead.disposition === 'hot' ? 'destructive' : 'secondary'}
-                    >
+                  <TableCell className="px-4">
+                    <Badge className={getDispositionBadgeColor(lead.disposition)}>
                       {lead.disposition}
                     </Badge>
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden md:table-cell px-4">
                     {lead.source || 'manual'}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden md:table-cell px-4">
                     <div className="flex flex-wrap gap-1">
                       {lead.tags.slice(0, 2).map((tag) => (
                         <Badge key={tag} variant="outline" className="text-xs">
@@ -393,60 +407,61 @@ export default function LeadList() {
                         </Badge>
                       ))}
                       {lead.tags.length > 2 && (
-                        <span className="text-xs text-muted-foreground">+{lead.tags.length - 2}</span>
+                        <span className="text-xs text-foreground-muted">+{lead.tags.length - 2}</span>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4">
                     {lead.last_activity ? (
-                      <div className="text-sm text-muted-foreground truncate max-w-[200px]" title={lead.last_activity}>
+                      <div className="text-sm text-foreground-secondary truncate max-w-[200px]" title={lead.last_activity}>
                         {lead.last_activity}
                       </div>
                     ) : (
-                      <div className="text-sm text-muted-foreground">No activity</div>
+                      <div className="text-sm text-foreground-muted">No activity</div>
                     )}
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">
+                  <TableCell className="hidden md:table-cell px-4">
                     {lead.last_activity_date ? (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-foreground-muted">
                         {new Date(lead.last_activity_date).toLocaleDateString()}
                       </span>
                     ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
+                      <span className="text-xs text-foreground-muted">-</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4">
                     <div className="flex items-center gap-2 relative">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setActionMenuLead(lead.id === actionMenuLead ? null : lead.id)}
+                        className="text-primary"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                       {actionMenuLead === lead.id && (
-                        <div className="absolute right-0 top-full mt-8 w-48 bg-card border shadow-lg rounded-lg z-10">
+                        <div className="absolute right-0 top-full mt-8 w-48 bg-surface border shadow-lg rounded-lg z-10">
                           <div className="py-1">
                             <Link
                               href={`/dashboard/leads/${lead.id}`}
-                              className="block px-3 py-2 text-sm hover:bg-muted transition-colors"
+                              className="block px-3 py-2 text-sm text-foreground hover:bg-hover transition-colors"
                             >
-                              <Eye className="w-4 h-4 mr-2" /> View Details
+                              <Eye className="w-4 h-4 mr-2 text-primary" /> View Details
                             </Link>
                             <button
-                              className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+                              className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-hover transition-colors"
                               onClick={() => window.location.href = `tel:${lead.phone}`}
                             >
-                              <Phone className="w-4 h-4 mr-2" /> Call
+                              <Phone className="w-4 h-4 mr-2 text-primary" /> Call
                             </button>
                             <button
-                              className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
+                              className="w-full text-left px-3 py-2 text-sm text-foreground hover:bg-hover transition-colors"
                               onClick={() => window.open(`mailto:${lead.email}`)}
                             >
-                              <Mail className="w-4 h-4 mr-2" /> Email
+                              <Mail className="w-4 h-4 mr-2 text-primary" /> Email
                             </button>
                             <button
-                              className="w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                              className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                               onClick={() => {/* Delete handler */}}
                             >
                               <Trash2 className="w-4 h-4 mr-2" /> Delete
@@ -467,31 +482,29 @@ export default function LeadList() {
       {showBulkSMSDialog && (
         <Dialog open={showBulkSMSDialog} onOpenChange={setShowBulkSMSDialog}>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Send Bulk SMS</DialogTitle>
-            </DialogHeader>
+            <h3 className="text-lg font-bold mb-4">Send Bulk SMS</h3>
             <div className="space-y-4">
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  This will send SMS to <span className="font-semibold">{selectedLeads.size}</span> selected lead(s)
+              <div className="bg-hover p-4 rounded-lg border border-border-light">
+                <p className="text-sm text-foreground-secondary">
+                  This will send SMS to <span className="font-semibold text-foreground">{selectedLeads.size}</span> selected lead(s)
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Message</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">Message</label>
                 <textarea
                   value={bulkSMSMessage}
                   onChange={(e) => setBulkSMSMessage(e.target.value)}
                   placeholder="Enter your message..."
                   rows={4}
-                  className="w-full border rounded-md p-3 focus:ring-2 focus:ring-ring"
+                  className="input-elite w-full"
                 />
               </div>
             </div>
             <div className="flex gap-3 justify-end pt-4 border-t">
-              <Button variant="outline" onClick={() => setShowBulkSMSDialog(false)}>
+              <Button variant="ghost" onClick={() => setShowBulkSMSDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleBulkSMS}>
+              <Button onClick={handleBulkSMS} className="btn-elite-primary">
                 Send SMS
               </Button>
             </div>
@@ -503,40 +516,38 @@ export default function LeadList() {
       {showBulkEmailDialog && (
         <Dialog open={showBulkEmailDialog} onOpenChange={setShowBulkEmailDialog}>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Send Bulk Email</DialogTitle>
-            </DialogHeader>
+            <h3 className="text-lg font-bold mb-4">Send Bulk Email</h3>
             <div className="space-y-4">
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  This will send email to <span className="font-semibold">{selectedLeads.size}</span> selected lead(s) with valid email addresses
+              <div className="bg-hover p-4 rounded-lg border border-border-light">
+                <p className="text-sm text-foreground-secondary">
+                  This will send email to <span className="font-semibold text-foreground">{selectedLeads.size}</span> selected lead(s) with valid email addresses
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Subject</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">Subject</label>
                 <Input
                   value={bulkEmailSubject}
                   onChange={(e) => setBulkEmailSubject(e.target.value)}
                   placeholder="Enter subject..."
-                  className="w-full"
+                  className="input-elite"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Message</label>
+                <label className="block text-sm font-medium mb-2 text-foreground">Message</label>
                 <textarea
                   value={bulkEmailMessage}
                   onChange={(e) => setBulkEmailMessage(e.target.value)}
                   placeholder="Enter your message... Use {firstName} and {lastName} for personalization"
                   rows={6}
-                  className="w-full border rounded-md p-3 focus:ring-2 focus:ring-ring"
+                  className="input-elite w-full"
                 />
               </div>
             </div>
             <div className="flex gap-3 justify-end pt-4 border-t">
-              <Button variant="outline" onClick={() => setShowBulkEmailDialog(false)}>
+              <Button variant="ghost" onClick={() => setShowBulkEmailDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleBulkEmail}>
+              <Button onClick={handleBulkEmail} className="btn-elite-primary">
                 Send Email
               </Button>
             </div>

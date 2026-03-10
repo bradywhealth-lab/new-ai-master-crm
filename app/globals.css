@@ -4,90 +4,252 @@
 
 @layer base {
   :root {
-    /* Professional Color Palette - Elite CRM Design System */
+    /* ==========================================
+       ELITE DESIGN SYSTEM - PREMIUM SLATE COLOR SCHEME
+       ========================================== */
 
-    /* Primary Brand Color - Trustworthy Deep Blue */
-    --primary: #0D6ED;
+    /* Primary Brand Color - Trustworthy Blue */
+    --primary: #3B82F6;
     --primary-foreground: #FFFFFF;
-    --primary-hover: #0A5BC;
+    --primary-hover: #5E9CF6;
 
-    /* Secondary - Elegant Purple Accent */
-    --secondary: #6366F6;
+    /* Secondary - Elegant Purple */
+    --secondary: #8B5CF6;
     --secondary-foreground: #FFFFFF;
 
     /* Destructive Actions - Critical Red */
     --destructive: #EF4444;
     --destructive-foreground: #FFFFFF;
 
-    /* Background Colors */
-    --background: #F9FAFB;
-    --foreground: #111827;
+    /* Success Green - Sold/Completed Outcomes */
+    --success: #10B981;
+    --success-foreground: #FFFFFF;
 
-    /* Card Colors */
-    --card: #FFFFFF;
-    --card-foreground: #111827;
-    --popover: #FFFFFF;
-    --popover-foreground: #111827;
+    /* Warning Yellow - Pending/Review Needed */
+    --warning: #F59E0B;
+    --warning-foreground: #FFFFFF;
+
+    /* Info Purple - AI Predictions */
+    --info: #8B5CF6;
+    --info-foreground: #FFFFFF;
+
+    /* Slate Backgrounds - Premium Dark Theme */
+    --background: #0F172A;           /* Dark slate - Primary dashboard background */
+    --surface: #1E293B;            /* Medium slate - Panel backgrounds */
+    --card: #1E293B;               /* Medium slate - Cards and modals */
+    --hover: #334155;              /* Light slate - Hover states and active elements */
+    --border: #334155;             /* Light slate - Borders */
+
+    /* Text Colors */
+    --foreground: #F8FAFC;          /* Primary text - Headings and body text */
+    --foreground-secondary: #94A3B8; /* Secondary text - Labels and metadata */
+    --foreground-muted: #64748B;     /* Muted text - Disabled states */
 
     /* Input Colors */
-    --input: #F3F4F6;
-    --ring: #3B82F6;
-
-    /* Border Colors */
-    --border: #E5E7EB;
-
-    /* Muted/Neutral Colors */
-    --muted: #9CA3AF;
-    --muted-foreground: #374151;
+    --input: #1E293B;               /* Slate-800 equivalent */
+    --ring: #3B82F6;               /* Blue-500 focus ring */
 
     /* Accent Colors */
-    --accent: #6366F6;
+    --accent: #3B82F6;             /* Primary blue accent */
     --accent-foreground: #FFFFFF;
-  }
 
-  .dark {
-    /* Dark Mode Colors */
-    --background: #111827;
-    --foreground: #F3F4F6;
-    --card: #1F2937;
-    --card-foreground: #F3F4F6;
-    --popover: #1F2937;
-    --popover-foreground: #F3F4F6;
-    --primary: #3B82F6;
-    --primary-foreground: #FFFFFF;
-    --primary-hover: #4D9EFB;
-    --secondary: #8B7EBD;
-    --secondary-foreground: #FFFFFF;
-    --muted: #6B7280;
-    --muted-foreground: #D1D5DB;
-    --accent: #8B7EBD;
-    --accent-foreground: #FFFFFF;
-    --border: #374151;
-    --input: #1F2937;
-    --ring: #2563EB;
+    /* Border Colors */
+    --border-light: #334155;
+    --border-muted: #1E293B;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
 
-  /* Professional Typography */
+  /* ==========================================
+       PROFESSIONAL TYPOGRAPHY
+       ========================================== */
+
   .font-sans {
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.005em;
   }
 
   .font-serif {
     font-family: 'Geist', 'Times New Roman', Times, serif;
   }
 
-  /* Custom Component Patterns */
+  .font-mono {
+    font-family: 'Fira Code', 'SF Mono', Consolas, 'Courier New', monospace;
+  }
+
+  /* ==========================================
+       CUSTOM COMPONENT PATTERNS - ELITE DESIGN
+       ========================================== */
+
+  /* Elite Card Design */
+  .card-elite {
+    @apply bg-card text-foreground rounded-lg border border-border-light;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .card-elite:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(15, 23, 42, 0.15);
+  }
+
+  /* Elite Button Styles */
+  .btn-elite-primary {
+    @apply bg-primary hover:bg-primary-hover text-primary-foreground;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-elite-primary:active {
+    transform: scale(0.98);
+    filter: brightness(0.95);
+  }
+
+  .btn-elite-secondary {
+    @apply bg-secondary hover:opacity-90 text-secondary-foreground;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-elite-ghost {
+    @apply bg-transparent border border-primary text-primary hover:bg-primary hover:text-primary-foreground;
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Elite Input Styles */
+  .input-elite {
+    @apply bg-surface text-foreground border border-border-muted;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .input-elite:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px var(--ring);
+  }
+
+  .input-elite::placeholder {
+    @apply text-foreground-muted;
+  }
+
+  /* Elite Status Badge Colors */
+  .badge-sold {
+    @apply bg-success text-success-foreground;
+  }
+
+  .badge-hot {
+    @apply bg-warning text-warning-foreground;
+  }
+
+  .badge-qualified {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .badge-nurture {
+    @apply bg-secondary text-secondary-foreground;
+  }
+
+  .badge-new {
+    @apply bg-foreground-muted text-foreground-secondary;
+  }
+
+  .badge-lost {
+    @apply bg-destructive text-destructive-foreground;
+  }
+
+  /* Elite Table Styles */
+  .table-elite {
+    @apply w-full border-collapse;
+  }
+
+  .table-header-elite {
+    @apply bg-hover text-foreground-secondary text-xs uppercase tracking-wider font-semibold;
+  }
+
+  .table-row-elite {
+    @apply border-b border-border-light transition-colors hover:bg-hover/50;
+  }
+
+  /* Loading Skeleton */
   .skeleton {
-    @apply animate-pulse bg-muted rounded-lg;
+    @apply animate-pulse bg-hover/50 rounded;
   }
 
   @keyframes pulse {
     0%, 100% {
-      @apply bg-muted-foreground/20;
+      @apply bg-hover/50;
     }
+    50% {
+      @apply bg-border-light;
+    }
+  }
+
+  /* ==========================================
+       INTERACTIVE PATTERNS
+       ========================================== */
+
+  /* Smooth transitions for all interactive elements */
+  .transition-smooth {
+    transition: all 0.2s ease-in-out;
+  }
+
+  /* Modal backdrop blur */
+  .modal-backdrop {
+    backdrop-filter: blur(4px);
+  }
+
+  /* Toast animation */
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .toast-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+
+  /* ==========================================
+       ACCESSIBILITY IMPROVEMENTS
+       ========================================== */
+
+  /* High contrast focus indicators */
+  *:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 4px;
+  }
+
+  /* Screen reader only content */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* ==========================================
+       LAYOUT UTILITIES
+       ========================================== */
+
+  .container-elite {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Consistent spacing utilities */
+  .spacing-unit {
+    width: 4px;
+    height: 4px;
   }
 }

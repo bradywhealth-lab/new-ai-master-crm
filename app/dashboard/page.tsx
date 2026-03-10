@@ -34,18 +34,9 @@ export default function DashboardPage() {
   useEffect(() => {
     const supabase = createClient()
     async function loadStats() {
-      const { count } = await supabase
-        .from('leads')
-        .select('*', { count: 'exact', head: true })
-
-      const { count: hotCount } = await supabase
-        .from('leads')
-        .select('*', { count: 'exact', head: true })
-        .eq('disposition', 'hot')
-
-      const { count: smsCount } = await supabase
-        .from('sms_logs')
-        .select('*', { count: 'exact', head: true })
+      const { count } = await supabase.from('leads').select('*', { count: 'exact', head: true })
+      const { count: hotCount } = await supabase.from('leads').select('*', { count: 'exact', head: true }).eq('disposition', 'hot')
+      const { count: smsCount } = await supabase.from('sms_logs').select('*', { count: 'exact', head: true }).gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
 
       setStats({
         totalLeads: count || 0,
@@ -54,7 +45,6 @@ export default function DashboardPage() {
         conversionRate: Math.round(((hotCount || 0) / (count || 1)) * 100),
       })
     }
-
     loadStats()
   }, [])
 
@@ -63,13 +53,13 @@ export default function DashboardPage() {
       case 'lead_added':
         return <Users className="w-5 h-5 text-primary" />
       case 'sms_sent':
-        return <MessageSquare className="w-5 h-5 text-green-500" />
+        return <MessageSquare className="w-5 h-5 text-success" />
       case 'email_sent':
-        return <Activity className="w-5 h-5 text-blue-500" />
+        return <Activity className="w-5 h-5 text-info" />
       case 'appointment':
-        return <Calendar className="w-5 h-5 text-purple-500" />
+        return <Calendar className="w-5 h-5 text-purple" />
       default:
-        return <Activity className="w-5 h-5 text-gray-500" />
+        return <Activity className="w-5 h-5 text-foreground-muted" />
     }
   }
 
@@ -84,36 +74,31 @@ export default function DashboardPage() {
     trend: 'up' | 'down' | 'neutral'
     icon: React.ReactNode
   }) => (
-    <Card className="hover:shadow-lg transition-all">
+    <Card className="card-elite">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
-          <div className="text-sm font-medium text-muted-foreground">
-            {title}
-          </div>
-          {trend === 'up' ? (
-            <div className="flex items-center text-green-500 text-sm font-medium">
-              <TrendingUp className="w-4 h-4 mr-1" />
-              +12%
+          <div>
+            <div className="text-xs font-semibold text-foreground-secondary uppercase tracking-wider">
+              {title}
             </div>
-          ) : trend === 'down' ? (
-            <div className="flex items-center text-red-500 text-sm font-medium">
-              <TrendingDown className="w-4 h-4 mr-1" />
-              -3%
-            </div>
-          ) : (
-            <div className="text-gray-400 text-sm font-medium">
-              0%
-            </div>
-          )}
-        </div>
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center">
-            <div className="bg-primary/10 p-2 rounded-lg mr-3">
+            <div className="flex items-center">
               {icon}
+              {trend === 'up' && (
+                <div className="flex items-center text-success text-sm font-medium ml-2">
+                  <TrendingUp className="w-4 h-4" />
+                  +12%
+                </div>
+              )}
+              {trend === 'down' && (
+                <div className="flex items-center text-destructive text-sm font-medium ml-2">
+                  <TrendingDown className="w-4 h-4" />
+                  -3%
+                </div>
+              )}
             </div>
-            <div className="text-3xl font-bold text-foreground">
-              {value.toLocaleString()}
-            </div>
+          </div>
+          <div className="text-3xl font-bold text-foreground">
+            {value.toLocaleString()}
           </div>
         </div>
       </CardContent>
@@ -122,29 +107,27 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Gradient Header */}
-      <header className="bg-gradient-to-r from-primary via-primary-hover to-primary-dark text-white">
-        <div className="container mx-auto px-6 py-4">
+      {/* Elite Gradient Header */}
+      <header className="bg-gradient-to-br from-primary via-primary-hover to-primary text-white py-6">
+        <div className="container mx-auto px-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">Dashboard</h1>
-              <p className="text-primary-light mt-1">Welcome back, Agent</p>
+              <p className="text-primary-foreground">Elite CRM - Your Insurance Command Center</p>
             </div>
             <div className="flex items-center gap-4">
-              <button className="relative p-2 rounded-full hover:bg-white/10 transition-colors">
-                <Bell className="w-6 h-6" />
-                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-                  3
-                </span>
-              </button>
-              <div className="flex items-center gap-3 bg-white/10 rounded-full px-4 py-2">
+              <Bell className="w-6 h-6 text-white/80" />
+              <button className="relative p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary font-bold">
                   JD
                 </div>
-                <div className="hidden md:block">
-                  <p className="text-sm font-medium">John Doe</p>
+                <div className="hidden md:block text-sm text-white/90">
+                  John Doe
                 </div>
-              </div>
+                <span className="absolute top-0 right-0 w-3 h-3 bg-destructive rounded-full text-white text-xs flex items-center justify-center">
+                  3
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -152,31 +135,31 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
-        {/* Stats Row */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Leads"
             value={stats.totalLeads}
-            trend="up"
+            trend="neutral"
             icon={<Users className="w-6 h-6 text-primary" />}
           />
           <StatCard
             title="Hot Leads"
             value={stats.hotLeads}
             trend="up"
-            icon={<BarChart className="w-6 h-6 text-orange-500" />}
+            icon={<BarChart className="w-6 h-6 text-warning" />}
           />
           <StatCard
             title="SMS This Week"
             value={stats.thisWeekSMS}
             trend="up"
-            icon={<MessageSquare className="w-6 h-6 text-green-500" />}
+            icon={<MessageSquare className="w-6 h-6 text-success" />}
           />
           <StatCard
             title="Conversion Rate"
-            value={stats.conversionRate}
-            trend="neutral"
-            icon={<TrendingUp className="w-6 h-6 text-blue-500" />}
+            value={`${stats.conversionRate}%`}
+            trend={stats.conversionRate > 0 ? 'up' : 'down'}
+            icon={<TrendingUp className="w-6 h-6 text-info" />}
           />
         </div>
 
@@ -184,26 +167,26 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Quick Actions - Spans 2 columns */}
           <div className="lg:col-span-2">
-            <Card>
+            <Card className="card-elite">
               <CardHeader>
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button variant="default" className="h-12 justify-start">
-                    <Plus className="w-5 h-5 mr-2" />
+                  <Button className="btn-elite-primary flex items-center justify-start gap-2">
+                    <Plus className="w-5 h-5" />
                     Add New Lead
                   </Button>
-                  <Button variant="secondary" className="h-12 justify-start">
-                    <MessageSquare className="w-5 h-5 mr-2" />
+                  <Button className="btn-elite-secondary flex items-center justify-start gap-2">
+                    <MessageSquare className="w-5 h-5" />
                     Send Bulk SMS
                   </Button>
-                  <Button variant="secondary" className="h-12 justify-start">
-                    <Activity className="w-5 h-5 mr-2" />
+                  <Button className="btn-elite-secondary flex items-center justify-start gap-2">
+                    <Activity className="w-5 h-5" />
                     Send Bulk Email
                   </Button>
-                  <Button variant="secondary" className="h-12 justify-start">
-                    <Activity className="w-5 h-5 mr-2" />
+                  <Button className="btn-elite-ghost border-border-light flex items-center justify-start gap-2">
+                    <Plus className="w-5 h-5" />
                     Import CSV
                   </Button>
                 </div>
@@ -213,7 +196,7 @@ export default function DashboardPage() {
 
           {/* Recent Activity - Spans 1 column */}
           <div>
-            <Card>
+            <Card className="card-elite">
               <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
               </CardHeader>
@@ -222,14 +205,14 @@ export default function DashboardPage() {
                   {recentActivity.map((activity, index) => (
                     <div
                       key={index}
-                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                      className="flex items-start gap-3 p-3 rounded border border-border-light hover:bg-hover transition-smooth"
                     >
-                      <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
+                      {getActivityIcon(activity.type)}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground">
                           {activity.message}
                         </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p className="text-xs text-foreground-muted mt-0.5">
                           {activity.time}
                         </p>
                       </div>
@@ -240,6 +223,19 @@ export default function DashboardPage() {
             </Card>
           </div>
         </div>
+
+        {/* Trend Chart Placeholder */}
+        <Card className="card-elite">
+          <CardHeader>
+            <CardTitle>Lead Trends</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-12 text-foreground-muted">
+              <BarChart className="w-12 h-12 mx-auto text-primary/20" />
+              <p className="mt-4 text-sm">Lead distribution by disposition</p>
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )
